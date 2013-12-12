@@ -1,0 +1,31 @@
+<!doctype html>
+
+<html>
+
+<head></head>
+
+<body>
+    <p>Coucou Yanlin, ceci est mon visualisateur.</p>
+
+    <p id="bla"></p>
+</body>
+
+<script type="text/javascript">
+    var reversedSplittedURL = window.location.href.split('').reverse().join('').split('/');
+    reversedSplittedURL.shift();
+    var PathURL = reversedSplittedURL.join('/').split('').reverse().join('');
+    var ExtractorResultURL = [PathURL, 'demo_extractor_result.txt'].join('/');
+
+    function reqListener () {
+      var p = document.getElementById('bla');
+      p.innerHTML = this.responseText;
+    };
+
+    var xhr = new XMLHttpRequest();
+    xhr.onload = reqListener;
+    currentUrl = window.location.href;
+    xhr.open('GET', ExtractorResultURL);
+    xhr.send();
+</script>
+
+</html>
