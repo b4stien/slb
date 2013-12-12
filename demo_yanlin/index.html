@@ -11,9 +11,9 @@
 </body>
 
 <script type="text/javascript">
-    var reversedSplittedURL = window.location.href.split('').reverse().join('').split('/');
-    reversedSplittedURL.shift();
-    var PathURL = reversedSplittedURL.join('/').split('').reverse().join('');
+    var splittedURL = window.location.href.split('/');
+    splittedURL.pop();
+    var PathURL = splittedURL.join('/');
     var ExtractorResultURL = [PathURL, 'demo_extractor_result.txt'].join('/');
 
     function reqListener () {
