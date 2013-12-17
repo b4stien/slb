@@ -1,92 +1,111 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8"/>
-		<link rel="stylesheet" href = "bootstrap/dist/css/bootstrap.css"/>
-		<title>View_tool MU</title>
-	</head>
 
-	<body style="padding: 0 15px;">
-	<div class="container">
-	<br/>
-		<div class="row">
-			<div class="col-md-2" style="border: 1px black solid;">
-			<strong>Identifiant : azx345</strong> <br/>	<tr class="container">
-			Date de prise en charge : 10/12/13 <br/>
-			Date de sortie nécessaire : 18/12/13 <br/>
-			Date de sortie au mieux : 20/12/13 <br/>
-			<mark style="color: red; background-color: white;">EN RETARD</mark>
-			</div>
-		</div>
-		<br/>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href ="bootstrap/dist/css/bootstrap.css">
+  <title>View_tool MU</title>
 
-		<div class="row">
-			<div class="col-md-10">
-			</div>
-			<div class="col-md-2">
-			<a class="choix" style="border: 1px black solid;">vue tableau</a> <a class="choix" style="border: 1px black solid; background-color: rgba(115,236,103,0.6);">vue blocs</a>
-			</div>
-		<h4 style="padding: 0 15px;"> Historique des tests </h4> <br/>
+  <style>
+    .visualisator-info li:first-child {
+      border-right:1px solid #555;
+    }
+    .visualisator-info span.label {
+      font-size: 90%;
+    }
+  </style>
+</head>
 
-		<div class="row">
-			<div class="col-md-1">
-			</div>
-			<div class="col-md-1" style="border: 1px black solid;">
-				<strong>Vibrations</strong> <br/>
-				<p style="text-align:right;">
-				date : 11/12/13<br/>
-				<mark style="color: green; background-color: white;">SUCCES</mark></p>
-			</div>
-			<div class="col-md-1">
-				<img src ="arrow_right.png" class="img-responsive" alt="Responsive image">
-			</div>
-			<div class="col-md-1" style="border: 1px black solid;">
-				<strong>Température</strong> <br/>
-				<p style="text-align:right;">
-				date : 12/12/13<br/>
-				<mark style="color: red; background-color: white;">ECHEC</mark></p>
-			</div>
-			<div class="col-md-1">
-				<img src ="arrow_right.png" class="img-responsive" alt="Responsive image">
-			</div>
-			<div class="col-md-1" style="border: 1px black solid;">
-				<strong>Température</strong> <br/>
-				<p style="text-align:right;">
-				date : 13/12/13<br/>
-				<mark style="color: green; background-color: white;">SUCCES</mark></p>
-			</div>
-			<div class="col-md-1">
-				<img src ="arrow_right.png" class="img-responsive" alt="Responsive image">
-			</div>
-			<div class="col-md-1" style="border: 1px black solid;">
-				<strong>Pression</strong> <br/>
-				<p style="text-align:right;">
-				date : 16/12/13<br/>
-				<mark style="color: green; background-color: white;">SUCCES</mark></p>
-			</div>
-		</div>
-		<br/>
-		<div class="row">
-			<div class="col-md-1" style="padding: 0 30px; text-decoration: underline;">
-				plus d'infos
-			</div>
-		</div>
-		<br/>
-		<br/>
+<body>
 
-		<div class="row">
-			<div class="col-md-1">
-			</div>
-			<div class="col-md-10" style="border: 1px black solid;">
-			<h4>Commentaires</h4>
-			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut placerat lectus a urna sollicitudin, at placerat orci tempor. Ut et scelerisque purus. Vivamus consectetur molestie tincidunt. Donec placerat eros ante, non euismod risus imperdiet a. Nunc ac viverra justo. Suspendisse eu enim a neque viverra facilisis sit amet non odio. Duis aliquam interdum pharetra. Sed euismod nulla et risus consequat, ac semper justo condimentum. Praesent sed lobortis lectus, ac consectetur purus. In non porta metus. Aenean eget gravida tortor. Sed adipiscing, nisl auctor dapibus tristique, quam est condimentum ipsum, eget vulputate nulla est eget nulla. Donec feugiat lorem sed est accumsan, non tempor est lacinia.
+<nav class="navbar navbar-inverse navbar-static-top"><div class="container">
+  <div class="navbar-header">
+    <a class="navbar-brand" href="#">Visualisator</a>
+  </div>
+  <ul class="nav navbar-nav navbar-right visualisator-info">
+    <li><a>Status: <span class="label label-success">Working</span></a></li>
+    <li><a>Last extraction: <span class="label label-success">17/12/2013 12:22</span></a></li>
+  </ul>
+</div></nav>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-2" style="border: 1px black solid;">
+    <strong>Identifiant : azx345</strong> <br/> <tr class="container">
+    Date de prise en charge : 10/12/13 <br/>
+    Date de sortie nécessaire : 18/12/13 <br/>
+    Date de sortie au mieux : 20/12/13 <br/>
+    <mark style="color: red; background-color: white;">EN RETARD</mark>
+    </div>
+  </div>
+  <br/>
+
+  <div class="row">
+    <div class="col-md-10">
+    </div>
+    <div class="col-md-2">
+    <a class="choix" style="border: 1px black solid;">vue tableau</a> <a class="choix" style="border: 1px black solid; background-color: rgba(115,236,103,0.6);">vue blocs</a>
+    </div>
+  <h4 style="padding: 0 15px;"> Historique des tests </h4> <br/>
+
+  <div class="row">
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-1" style="border: 1px black solid;">
+      <strong>Vibrations</strong> <br/>
+      <p style="text-align:right;">
+      date : 11/12/13<br/>
+      <mark style="color: green; background-color: white;">SUCCES</mark></p>
+    </div>
+    <div class="col-md-1">
+      <img src ="arrow_right.png" class="img-responsive" alt="Responsive image">
+    </div>
+    <div class="col-md-1" style="border: 1px black solid;">
+      <strong>Température</strong> <br/>
+      <p style="text-align:right;">
+      date : 12/12/13<br/>
+      <mark style="color: red; background-color: white;">ECHEC</mark></p>
+    </div>
+    <div class="col-md-1">
+      <img src ="arrow_right.png" class="img-responsive" alt="Responsive image">
+    </div>
+    <div class="col-md-1" style="border: 1px black solid;">
+      <strong>Température</strong> <br/>
+      <p style="text-align:right;">
+      date : 13/12/13<br/>
+      <mark style="color: green; background-color: white;">SUCCES</mark></p>
+    </div>
+    <div class="col-md-1">
+      <img src ="arrow_right.png" class="img-responsive" alt="Responsive image">
+    </div>
+    <div class="col-md-1" style="border: 1px black solid;">
+      <strong>Pression</strong> <br/>
+      <p style="text-align:right;">
+      date : 16/12/13<br/>
+      <mark style="color: green; background-color: white;">SUCCES</mark></p>
+    </div>
+  </div>
+  <br/>
+  <div class="row">
+    <div class="col-md-1" style="padding: 0 30px; text-decoration: underline;">
+      plus d'infos
+    </div>
+  </div>
+  <br/>
+  <br/>
+
+  <div class="row">
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-10" style="border: 1px black solid;">
+    <h4>Commentaires</h4>
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut placerat lectus a urna sollicitudin, at placerat orci tempor. Ut et scelerisque purus. Vivamus consectetur molestie tincidunt. Donec placerat eros ante, non euismod risus imperdiet a. Nunc ac viverra justo. Suspendisse eu enim a neque viverra facilisis sit amet non odio. Duis aliquam interdum pharetra. Sed euismod nulla et risus consequat, ac semper justo condimentum. Praesent sed lobortis lectus, ac consectetur purus. In non porta metus. Aenean eget gravida tortor. Sed adipiscing, nisl auctor dapibus tristique, quam est condimentum ipsum, eget vulputate nulla est eget nulla. Donec feugiat lorem sed est accumsan, non tempor est lacinia.
 
 Suspendisse mi mauris, pellentesque et fermentum at, hendrerit nec purus. Vivamus laoreet molestie diam vel facilisis. Etiam sodales tellus a aliquam mollis. Nam convallis sapien ac augue fringilla, sit amet vehicula eros dapibus. Ut condimentum felis vel dui malesuada, sed facilisis arcu viverra. Nunc lacus dolor, euismod nec felis in, vehicula facilisis nibh. Integer imperdiet lobortis elit vel laoreet.
 
-			</div>
-		</div>
-		</div>
-	</body>
+    </div>
+  </div>
+  </div>
+</body>
 
 </html>
-
