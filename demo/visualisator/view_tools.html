@@ -1,35 +1,118 @@
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8"/>
-		<link rel="stylesheet" href = "bootstrap-3.0.3-dist/dist/css/bootstrap.css"/>
-		<title>View_tools MU</title>
-	</head>
 
-	<body>
-	<h3>Liste des Tools</h3>
-	<table class="table">
-	<tr>
-	<th id="00">Nom</th><th id="10">Date d'arrivée</th><th id="20">Date de sortie requise</th><th id="30">date de sortie prévue</th><th id="40">test en cours</th></tr>
-	<tbody>
-	<tr>
-	<td id="01">Tool1</td><td id="11">25/07/1990</td><td id="21">31/12/2013</td><td id="31">25/12/2013</td><td id="41">Vibrations</td></tr>
-	<tr>
-	<td id="02">Tool2</td><td id="12">06/12/1993</td><td id="22">18/12/2013</td><td id="32">18/12/2013</td><td id="42">Pression</td></tr>
-	<tr>
-	<td id="03">Tool3</td><td id="13">11/09/1998</td><td id="23">13/12/2013</td><td id="33">19/12/2013</td><td id="43">Radioactivité</td></tr>
-	<tr>
-	<td id="04">Tool4</td><td id="14">17/05/2012</td><td id="24">20/12/2013</td><td id="34">19/12/2013</td><td id="44">Température</td></tr>
-	<tr>
-	<td id="01">Tool5</td><td id="11">25/07/1990</td><td id="21">31/12/2013</td><td id="31">25/12/2013</td><td id="41">Vibrations</td></tr>
-	<tr>
-	<td id="02">Tool6</td><td id="12">06/12/1993</td><td id="22">18/12/2013</td><td id="32">18/12/2013</td><td id="42">Pression</td></tr>
-	<tr>
-	<td id="03">Tool7</td><td id="13">11/09/1998</td><td id="23">13/12/2013</td><td id="33">19/12/2013</td><td id="43">Radioactivité</td></tr>
-	<tr>
-	<td id="04">Tool8</td><td id="14">17/05/2012</td><td id="24">20/12/2013</td><td id="34">19/12/2013</td><td id="44">Température</td></tr>
-	</tbody>
-	</table>
-	</body>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href ="bootstrap/dist/css/bootstrap.css">
+  <title>View_tools MU</title>
 
+  <style>
+    .visualisator-info li:first-child {
+      border-right: 1px solid #555;
+    }
+    span.label {
+      font-size: 90%;
+    }
+    h3 .btn-head {
+      margin-top: -4px;
+    }
+    .tool-tests {
+      margin-top: 30px;
+      margin-bottom: 30px;
+    }
+    .tool-test {
+      border: 1px solid #ddd;
+      padding: 4px;
+    }
+  </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-static-top"><div class="container">
+  <div class="navbar-header">
+    <a class="navbar-brand" href="#">Visualisator</a>
+  </div>
+  <ul class="nav navbar-nav navbar-right visualisator-info">
+    <li><a>Status: <span class="label label-success">Working</span></a></li>
+    <li><a>Last extraction: <span class="label label-success">17/12/2013 12:22</span></a></li>
+  </ul>
+</div></nav>
+
+<div class="container">
+
+<h3>Tools List</h3>
+
+<table class="table table-bordered table-hover">
+<thead>
+  <tr>
+    <th id="00">Name</th>
+    <th id="10">Registered</th>
+    <th id="20">Wanted</th>
+    <th id="30">Best</th>
+    <th id="40">Current test</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td id="01">Tool1</td>
+    <td id="11">25/07/1990</td>
+    <td id="21">31/12/2013</td>
+    <td id="31">25/12/2013</td>
+    <td id="41">Vibrations</td>
+  </tr>
+  <tr>
+    <td id="02">Tool2</td>
+    <td id="12">06/12/1993</td>
+    <td id="22">18/12/2013</td>
+    <td id="32">18/12/2013</td>
+    <td id="42">Pression</td>
+  </tr>
+  <tr class="danger">
+    <td id="03">Tool3</td>
+    <td id="13">11/09/1998</td>
+    <td id="23">13/12/2013</td>
+    <td id="33">19/12/2013</td>
+    <td id="43">Radioactivité</td>
+  </tr>
+  <tr>
+    <td id="04">Tool4</td>
+    <td id="14">17/05/2012</td>
+    <td id="24">20/12/2013</td>
+    <td id="34">19/12/2013</td>
+    <td id="44">Température</td>
+  </tr>
+  <tr>
+    <td id="01">Tool5</td>
+    <td id="11">25/07/1990</td>
+    <td id="21">31/12/2013</td>
+    <td id="31">25/12/2013</td>
+    <td id="41">Vibrations</td>
+  </tr>
+  <tr>
+    <td id="02">Tool6</td>
+    <td id="12">06/12/1993</td>
+    <td id="22">18/12/2013</td>
+    <td id="32">18/12/2013</td>
+    <td id="42">Pression</td>
+  </tr>
+  <tr class="danger">
+    <td id="03">Tool7</td>
+    <td id="13">11/09/1998</td>
+    <td id="23">13/12/2013</td>
+    <td id="33">19/12/2013</td>
+    <td id="43">Radioactivité</td>
+  </tr>
+  <tr>
+    <td id="04">Tool8</td>
+    <td id="14">17/05/2012</td>
+    <td id="24">20/12/2013</td>
+    <td id="34">19/12/2013</td>
+    <td id="44">Température</td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</body>
 </html>
