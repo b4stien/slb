@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href ="bootstrap/dist/css/bootstrap.css">
+  <link rel="stylesheet" href="font-awesome-4.0.3/css/font-awesome.min.css">
+  <title>Matrix_View_Version2</title>
+
+  <style>
+    .visualisator-info li:first-child {
+      border-right: 1px solid #555;
+    }
+    span.label {
+      font-size: 90%;
+    }
+    h3 .btn-head {
+      margin-top: -4px;
+    }
+    .tool-tests {
+      margin-top: 30px;
+      margin-bottom: 30px;
+    }
+    .tool-test {
+      border: 1px solid #ddd;
+      padding: 4px;
+    }
+  </style>
+</head>
+
+<nav class="navbar navbar-inverse navbar-static-top">
+  <div class="container">
+  <div class="navbar-header">
+    <a class="navbar-brand" href="#">Visualisator_Matrix</a>
+  </div>
+  <ul class="nav navbar-nav navbar-right visualisator-info">
+    <li><a>Status: <span class="label label-success">Working</span></a></li>
+    <li><a>Last extraction: <span class="label label-success">14/12/2013 12:22</span></a></li>
+  </ul>
+</div></nav>
+
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="span12">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th>
+							TOOL/TEST
+						</th>
+						<th>
+							TOOL1
+						</th>
+						<th>
+							TOOL2
+						</th>
+						<th>
+							TOOL3
+						</th>
+						<th>
+							TOOL4
+						</th>
+						<th>
+							TOOL5
+						</th>
+						<th>
+							TOOL6
+						</th>
+						<th>
+							TOOL7
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							Test1
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							Test2
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							Test3
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+					</tr>
+					<tr >
+						<td>
+							Test4
+						</td>
+						<td class="success">
+							<i class="fa fa-minus"></i> 
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+						<td class="warning">
+							<i class="fa fa-flag"></i> 13/12/2013
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+						<td class="warning">
+							<i class="fa fa-flag"></i> 12/12/2013
+						</td>
+					</tr>
+					<tr >
+						<td>
+							Test5
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+						<td class="warning">
+							<i class="fa fa-flag"></i> 13/12/2013
+						</td>
+						<td class="success">
+							<i class="fa fa-check"></i>
+						</td>
+						<td class="danger">
+							<i class="fa fa-spinner"></i> 15/12/2013
+						</td>
+						<td class="success">
+							<i class="fa fa-minus"></i> 
+						</td>
+						<td class="warning">
+							<i class="fa fa-flag"></i> 13/12/2013
+						</td>
+						<td class="danger">
+							<i class="fa fa-spinner"></i> 15/12/2013
+						</td>
+					</tr>
+					<tr >
+						<td>
+							Test6
+						</td>
+						
+						<td class="warning">
+							<i class="fa fa-flag"></i> 12/12/2013
+						</td>
+						<td class="danger">
+							<i class="fa fa-spinner"></i> 15/12/2013
+						</td>
+						<td class="warning">
+							<i class="fa fa-flag"></i> 14/12/2013
+						</td>
+						<td class="danger">
+							<i class="fa fa-spinner"></i> 20/12/2013
+						</td>
+						<td class="warning">
+							<i class="fa fa-flag"></i> 12/12/2013
+						</td>
+						<td class="danger">
+							<i class="fa fa-spinner"></i> 17/12/2013
+						</td>
+						<td class="danger">
+							<i class="fa fa-spinner"></i> 17/12/2013
+						</td>
+					</tr>
+					<tr>
+						<td>
+							Test7
+						</td>
+						<td class="danger">
+							<i class="fa fa-spinner"></i> 13/12/2013
+						</td>
+						<td class="danger">
+							<i class="fa fa-spinner"></i> 17/12/2013
+						</td>
+						<td class="danger">
+							<i class="fa fa-spinner"></i> 28/12/2013
+						</td>
+						<td class="danger">
+							<i class="fa fa-spinner"></i> 23/12/2013
+						</td>
+						<td class="danger">
+							<i class="fa fa-spinner"></i> 23/12/2013
+						</td>
+						<td class="danger">
+							<i class="fa fa-spinner"></i> 19/12/2013
+						</td>
+						<td class="danger">
+							<i class="fa fa-spinner"></i> 24/12/2013
+						</td>
+						
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
