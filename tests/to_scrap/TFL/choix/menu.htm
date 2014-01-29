@@ -1,0 +1,693 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"><meta http-equiv="charset" content="utf-8">
+	
+	
+		<script language="javascript">
+			if ((top != self) && parent.frames[1].name == 'toolbar'){ parent.frames[1].location.href = "http://equality-eur.slb.com/toolbar.cfm"; }
+		</script>
+	
+
+<script type="text/javascript" src="menu_data/ajax.js"></script>
+<script type="text/javascript" src="menu_data/ajax_users.js"></script>
+<script type="text/javascript" src="menu_data/ajax_productlines.js"></script>
+<script type="text/javascript" src="menu_data/ajax_departments.js"></script>
+<script type="text/javascript" src="menu_data/search.js"></script>
+
+
+
+  
+  
+  
+  <title>Test Fail Logs Search Page</title>
+  <link rel="stylesheet" href="menu_data/eQ.css">
+  </head>
+  
+  
+  
+  <body onload="javascript:setValues();
+     ">
+  
+  
+  
+  <p class="header" align="center">Test Fail Logs Search Page</p>
+  <div align="center">
+    <form method="post" action="/MatsTest/test_fail_log.cfm" name="form1" onsubmit="return checkValidations('/support/saveQuery.cfm?module=TFL', this);">
+      <input value="Reset" onclick="resetUsers('inspector','modified_by');resetUsers('engineer','dispositioned_by');resetProductLines();resetDepartments();return enableTextFields(form1);" type="reset">
+      <input value="Submit" type="submit">
+      <br>
+      <table bgcolor="#003366" border="0" cellpadding="0" cellspacing="0">
+        <tbody><tr><td>
+          <table id="searchTable" cellpadding="0" cellspacing="0">
+            <tbody><tr>
+              <td class="leftcol">Test Taken ID:</td>
+              <td colspan="2" bgcolor="white">
+                
+                
+                
+                <select name="test_taken_id_Op">
+                  <option selected="selected" value="No Selection">No Selection
+                  </option><option value="=">Equal to
+                  
+                  </option><option value="In">In
+                  </option><option value="&gt;=">&gt;=
+                  </option><option value="&lt;">&lt;
+                </option></select>
+                <input style="width:172px;" name="test_taken_id" type="text">
+                
+              </td>
+              <td style="color:#FF0000; font-size:10px; background-color:white;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="leftcol">Test ID:</td>
+              <td colspan="2" bgcolor="white">
+                
+                
+                
+                <select name="test_id_Op">
+                  <option selected="selected" value="No Selection">No Selection
+                  </option><option value="=">Equal to
+                  </option><option value="like">Like
+                  
+                  </option><option value="In">In
+                  </option><option value="&gt;=">&gt;=
+                  </option><option value="&lt;">&lt;
+                </option></select>
+                <input style="width:172px;" name="test_id" type="text">
+                
+              </td>
+              <td style="color:#FF0000; font-size:10px; background-color:white;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="leftcol">Test Name:</td>
+              <td colspan="2" bgcolor="white">
+                
+                
+                
+                <select name="test_name_Op">
+                  <option selected="selected" value="No Selection">No Selection
+                  </option><option value="=">Equal to
+                  </option><option value="like">Like
+                </option></select>
+                <input style="width:172px;" name="test_name" type="text">
+                
+              </td>
+              <td style="color:#FF0000; font-size:10px; background-color:white;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="leftcol">Version:</td>
+              <td colspan="2" bgcolor="white">
+                
+                
+                
+                <select name="test_version_Op">
+                  <option selected="selected" value="No Selection">No Selection
+                  </option><option value="=">Equal to
+                  </option><option value="&gt;=">&gt;=
+                  </option><option value="&lt;">&lt;
+                </option></select>
+                <input style="width:172px;" name="test_version" type="text">
+                
+              </td>
+              <td style="color:#FF0000; font-size:10px; background-color:white;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="leftcol">Try No:</td>
+              <td colspan="2" bgcolor="white">
+                
+                
+                
+                <select name="try_no_Op">
+                  <option selected="selected" value="No Selection">No Selection
+                  </option><option value="=">Equal to
+                  </option><option value="&gt;=">&gt;=
+                  </option><option value="&lt;">&lt;
+                </option></select>
+                <input style="width:172px;" name="try_no" type="text">
+                
+              </td>
+              <td style="color:#FF0000; font-size:10px; background-color:white;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="leftcol">Work Order ID:</td>
+              <td colspan="2" bgcolor="white">
+                
+                
+                
+                <select name="work_order_id_Op">
+                  <option selected="selected" value="No Selection">No Selection
+                  </option><option value="=">Equal to
+                  </option><option value="like">Like
+                  
+                  </option><option value="In">In
+                  
+                  
+                  </option><option value="Blank">Is Blank
+                  </option><option value="Not Blank">Is not Blank
+                  
+                </option></select>
+                <input style="width:172px;" name="work_order_id" type="text">
+                
+              </td>
+              <td style="color:#FF0000; font-size:10px; background-color:white;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="leftcol">Work Order No:</td>
+              <td colspan="2" bgcolor="white">
+                
+                
+                
+                <select name="work_order_no_Op">
+                  <option selected="selected" value="No Selection">No Selection
+                  </option><option value="=">Equal to
+                  </option><option value="like">Like
+                  
+                  </option><option value="In">In
+                  </option><option value="&gt;=">&gt;=
+                  </option><option value="&lt;">&lt;
+                </option></select>
+                <input style="width:172px;" name="work_order_no" type="text">
+                
+              </td>
+              <td style="color:#FF0000; font-size:10px; background-color:white;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="leftcol">Work Center:</td>
+              <td colspan="2" bgcolor="white">
+                
+                
+                
+                <select name="work_center_Op">
+                  <option selected="selected" value="No Selection">No Selection
+                  </option><option value="=">Equal to
+                  </option><option value="like">Like
+                  
+                  </option><option value="In">In
+                  
+                  
+                  </option><option value="Blank">Is Blank
+                  </option><option value="Not Blank">Is not Blank
+                  
+                </option></select>
+                <input style="width:172px;" name="work_center" type="text">
+                
+              </td>
+              <td style="color:#FF0000; font-size:10px; background-color:white;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="leftcol">Operation No:</td>
+              <td colspan="2" bgcolor="white">
+                
+                
+                
+                <select name="operation_no_Op">
+                  <option selected="selected" value="No Selection">No Selection
+                  </option><option value="=">Equal to
+                  </option><option value="like">Like
+                  
+                  </option><option value="In">In
+                  </option><option value="&gt;=">&gt;=
+                  </option><option value="&lt;">&lt;
+                </option></select>
+                <input style="width:172px;" name="operation_no" type="text">
+                
+              </td>
+              <td style="color:#FF0000; font-size:10px; background-color:white;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="leftcol">Part Number:</td>
+              <td colspan="2" bgcolor="white">
+                
+                
+                
+                <select name="part_no_Op">
+                  <option selected="selected" value="No Selection">No Selection
+                  </option><option value="=">Equal to
+                  </option><option value="like">Like
+                  
+                  </option><option value="In">In
+                  </option><option value="&gt;=">&gt;=
+                  </option><option value="&lt;">&lt;
+                </option></select>
+              <input style="width:172px;" name="part_no" type="text">
+              
+            </td>
+            <td style="color:#FF0000; font-size:10px; background-color:white;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="leftcol">Part Description:</td>
+              <td colspan="2" bgcolor="white">
+                
+                
+                
+                <select name="part_desc_Op">
+                  <option selected="selected" value="No Selection">No Selection
+                  </option><option value="=">Equal to
+                  </option><option value="like">Like
+                </option></select>
+                <input style="width:172px;" name="part_desc" type="text">
+                
+              </td>
+              <td style="color:#FF0000; font-size:10px; background-color:white;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="leftcol">Serial No:</td>
+              <td colspan="2" bgcolor="white">
+                
+                
+                
+                <select name="serial_no_Op">
+                  <option selected="selected" value="No Selection">No Selection
+                  </option><option value="=">Equal to
+                  </option><option value="like">Like
+                  
+                  </option><option value="In">In
+                  
+                  
+                  </option><option value="Blank">Is Blank
+                  </option><option value="Not Blank">Is not Blank
+                  
+                </option></select>
+                <input style="width:172px;" name="serial_no" type="text">
+                  
+              </td>
+              <td style="color:#FF0000; font-size:10px; background-color:white;">&nbsp;</td>
+            </tr>
+            
+            
+            <tr>
+              <td class="leftcol">Parent Serial:</td>
+              <td colspan="2" bgcolor="white">
+                
+                
+                
+                <select name="parent_serial_Op">
+                  <option selected="selected" value="No Selection">No Selection
+                  </option><option value="=">Equal to
+                  </option><option value="like">Like
+                  </option><option value="In">In
+                  </option><option value="Blank">Is Blank
+                  </option><option value="Not Blank">Is not Blank
+                </option></select>
+                <input style="width:172px;" name="parent_serial" type="text">
+                  
+              </td>
+              <td style="color:#FF0000; font-size:10px; background-color:white;">&nbsp;</td>
+            </tr>
+            
+            <tr>
+              <td class="leftcol">Product Line Description:</td>
+              <td colspan="2" bgcolor="white">
+                
+                
+                
+                <select name="product_line_desc_Op">
+                  <option selected="selected" value="No Selection">No Selection
+                  </option><option value="=">Equal to
+                  </option><option value="like">Like
+                </option></select>
+                <input style="width:172px;" name="product_line_desc" type="text">
+                
+              </td>
+              <td style="color:#FF0000; font-size:10px; background-color:white;">&nbsp;</td>
+            </tr>
+						
+						
+            <tr>
+              <td class="leftcol">Project Name:</td>
+              <td colspan="2" bgcolor="white">
+							  
+                
+                <select name="project_name_Op">
+                  <option selected="selected" value="No Selection">No Selection
+                  </option><option value="=">Equal to
+                  </option><option value="like">Like
+                  </option><option value="Blank">Is Blank
+                  </option><option value="Not Blank">Is not Blank
+                </option></select>
+                <input style="width:174px;" name="project_name" type="text">
+              </td>
+              <td style="color:#FF0000; font-size:10px; background-color:white;">&nbsp;</td>
+            </tr>
+            
+            <tr>
+              <td class="leftcol">PO Number:</td>
+              <td colspan="2" bgcolor="white">
+                
+                
+                
+                <select name="po_no_Op">
+                  <option selected="selected" value="No Selection">No Selection
+                  </option><option value="=">Equal to
+                  </option><option value="like">Like
+                  
+                  </option><option value="In">In
+                  </option><option value="&gt;=">&gt;=
+                  </option><option value="&lt;">&lt;
+                  </option><option value="Blank">Is Blank
+                  </option><option value="Not Blank">Is not Blank
+                  
+                </option></select>
+                <input style="width:172px;" name="po_no" type="text">
+                  
+              </td>
+              <td style="color:#FF0000; font-size:10px; background-color:white;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="leftcol">Performed Date:</td>
+              <td colspan="2" bgcolor="white">
+                
+                
+                
+                <select name="performed_date_Op">
+                  <option selected="selected" value="No Selection">No Selection
+                  </option><option value="=">Equal To
+                  </option><option value="&gt;=">&gt;=
+                  </option><option value="&lt;=">&lt;=
+                  </option><option value="Between">Between
+                </option></select>
+                
+                  <input style="width:84px;" name="performed_date" type="Text">
+                  <input style="width:84px;" name="performed_date_2" type="Text">
+                
+                
+              </td>
+              <td style="font-size:10px; background-color:white;">&nbsp;mm/dd/yyyy or mm-dd-yyyy</td>
+            </tr>
+            <tr>
+              <td class="leftcol">Modified Date:</td>
+              <td colspan="2" bgcolor="white">
+                
+                
+                
+                <select name="modified_date_Op">
+                  <option selected="selected" value="No Selection">No Selection
+                  </option><option value="=">Equal To
+                  </option><option value="&gt;=">&gt;=
+                  </option><option value="&lt;=">&lt;=
+                  </option><option value="Between">Between
+                </option></select>
+                
+                  <input style="width:84px;" name="modified_date" type="Text">
+                  <input style="width:84px;" name="modified_date_2" type="Text">
+                
+                
+              </td>
+              <td style="font-size:10px; background-color:white;">&nbsp;mm/dd/yyyy or mm-dd-yyyy</td>
+            </tr>
+            <tr>
+              <td class="leftcol">Supplier Name:</td>
+              <td colspan="2" bgcolor="white">
+                
+                
+                
+                <select name="supplier_name_Op">
+                  <option selected="selected" value="No Selection">No Selection
+                  </option><option value="=">Equal to
+                  </option><option value="like">Like
+                </option></select>
+                <input style="width:172px;" name="supplier_name" type="text">
+                
+              </td>
+              <td style="color:#FF0000; font-size:10px; background-color:white;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="leftcol">Supplier No:</td>
+              <td colspan="2" bgcolor="white">
+                
+                
+                
+                <select name="supplier_no_Op">
+                  <option selected="selected" value="No Selection">No Selection
+                  </option><option value="=">Equal to
+                  </option><option value="like">Like
+                  
+                  </option><option value="In">In
+                </option></select>
+                <input style="width:172px;" name="supplier_no" type="text">
+                
+              </td>
+              <td style="color:#FF0000; font-size:10px; background-color:white;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="leftcol">Site:</td>
+              <td colspan="2" bgcolor="white">
+                <select id="site" name="site" style="width:274px;" onchange="resetUsers('inspector','modified_by');resetUsers('engineer','dispositioned_by');resetDepartments();resetProductLines();">
+                  <option value="No Selection">No Selection
+                  
+                      </option><option value="0500">0500:Curacao Manufacturing 
+                      </option><option value="100">100:Houston-Ardmore 
+                      </option><option value="1000">1000:SPC 
+                      </option><option value="1010">1010:SPC Global Sourcing 
+                      </option><option value="103">103:Edmonton CPL 
+                      </option><option value="110">110:Belfast 
+                      </option><option value="120">120:Sensa 
+                      </option><option value="130">130:OPPC 
+                      </option><option value="160">160:DPC 
+                      </option><option value="160X">160X:DPCX 
+                      </option><option value="165">165:Shanghai CPL 
+                      </option><option value="2000">2000:WOTC 
+                      </option><option value="201">201:Bartlesville 
+                      </option><option value="202">202:Lawrence 
+                      </option><option value="202C">202C:Lawrence Consign. 
+                      </option><option value="211">211:Singapore 
+                      </option><option value="220">220:SWTC 
+                      </option><option value="221">221:Lasalle 
+                      </option><option value="231">231:Phoenix 
+                      </option><option value="241">241:Edmonton ACA 
+                      </option><option value="320">320:WPPC 
+                      </option><option value="330">330:DBR 
+                      </option><option value="340P">340P:SRPC- Global Purchasing 
+                      </option><option value="411">411:IPC-SG 
+                      </option><option value="420">420:Reslink USA 
+                      </option><option value="423">423:Reslink Norway 
+                      </option><option value="425">425:Reslink Dammam 
+                      </option><option value="5000">5000:IPC 
+                      </option><option value="5000A">5000A:IPC-ABBEVILLE 
+                      </option><option value="5100">5100:ESC 
+                      </option><option value="6000">6000:SRC 
+                      </option><option value="610">610:Geoservices 
+                      </option><option value="651">651:Shanghai 
+                      </option><option value="7000">7000:PTC 
+                      </option><option value="7050">7050:Kihei 
+                      </option><option value="710">710:RPM-Mexico 
+                      </option><option value="730">730:CMPU 
+                      </option><option value="800">800:MEMS 
+                      </option><option value="8000">8000:SHPC 
+                      </option><option value="8010">8010:SDRM 
+                      </option><option value="8050">8050:SHPC/STC 
+                      </option><option value="902">902:Tyumen 
+                      </option><option value="932">932:Tyumen Perf. Guns 
+                      </option><option value="9950">9950:EMI 
+                      </option><option value="MFG" selected="selected">MFG:SRPC 
+                      </option><option value="SKK">SKK:SKK 
+                  
+                </option></select>
+              </td>
+              <td style="color:#FF0000; font-size:10px; background-color:white;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="leftcol">Test Category:</td>
+              <td colspan="2" bgcolor="white">
+                
+                
+                
+                <select name="category" style="width:274px;">
+                  <option selected="selected" value="No Selection">No Selection
+                  
+                    </option><option value="3">Assembly</option>
+                  
+                    <option value="8">Calibration</option>
+                  
+                    <option value="4">Diagnostic/Continuity</option>
+                  
+                    <option value="5">Heat</option>
+                  
+                    <option value="16">Integration</option>
+                  
+                    <option value="10">IST</option>
+                  
+                    <option value="18">Job Prep</option>
+                  
+                    <option value="9">OST/CAT/FAT</option>
+                  
+                    <option value="1">Other</option>
+                  
+                    <option value="15">Pressure</option>
+                  
+                    <option value="7">Rolling Shock</option>
+                  
+                    <option value="6">Shock</option>
+                  
+                    <option value="19">Trace Check and/or Documentation</option>
+                  
+                    <option value="17">Traceability</option>
+                  
+                    <option value="20">Vibration</option>
+                  
+                </select>
+                
+              </td>
+              <td style="color:#FF0000; font-size:10px; background-color:white;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="leftcol">Technician:</td>
+              <td colspan="2" id="box_inspectors" bgcolor="white">
+                 
+                <select id="modified_by" name="modified_by" style="width:274px;" onfocus="fetchUsers(document.getElementById('site').value,'inspector','All',this.id,'');"><option selected="selected" value="No Selection">No Selection</option></select>
+              </td>
+              <td style="color:#000000; font-size:10px; background-color:white;" id="box_insM">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="leftcol">Engineer:</td>
+              <td colspan="2" id="box_engineers" bgcolor="white">
+                 
+                <select id="dispositioned_by" name="dispositioned_by" style="width:274px;" onfocus="fetchUsers(document.getElementById('site').value,'engineer','All',this.id,'');"><option selected="selected" value="No Selection">No Selection</option></select>
+              </td>
+              <td style="color:#000000; font-size:10px; background-color:white;" id="box_engM">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="leftcol">Disposition Result:</td>
+              <td colspan="2" bgcolor="white">
+                
+                
+                
+                <select name="disposition_result" style="width:274px;" multiple="multiple" size="3">
+                  <option value="No Selection">No Selection
+                  
+                    </option><option value="10">Send Back For More Details</option>
+                  
+                    <option value="11">Re-perform</option>
+                  
+                    <option value="12">Scrap</option>
+                  
+                    <option value="13">Acceptable (Use As Is)</option>
+                  
+                </select>
+                
+              </td>
+              <td style="color:#000000; font-size:10px; background-color:white;">Hold ctrl for multiple choices</td>
+            </tr>
+            <tr>
+              <td class="leftcol">Product Line:</td>
+              <td colspan="2" id="box_productlines" bgcolor="white">
+                 
+                <select id="product_line" name="product_line" style="width:274px;" onfocus="fetchProductLines(document.getElementById('site').value,'product_line','All','');"><option selected="selected" value="No Selection">No Selection</option></select>
+              </td>
+              <td style="color:#000000; font-size:10px; background-color:white;" id="box_proM">&nbsp;</td>
+            </tr>
+						<tr>
+              <td class="leftcol">Department:</td>
+              <td colspan="2" id="box_departments" bgcolor="white">
+                 
+                <select id="department" name="department" style="width:274px;" onfocus="fetchDepartments(document.getElementById('site').value,'department','All','');"><option selected="selected" value="No Selection">No Selection</option></select>
+              </td>
+              <td style="color:#000000; font-size:10px; background-color:white;" id="box_depM">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="leftcol">Status:</td>
+              <td colspan="2" bgcolor="white">
+                
+                
+                
+                <select name="test_status" style="width:274px;" multiple="multiple" size="3">
+                  <option value="No Selection">No Selection
+                  
+                    </option><option value="3">Fail</option>
+                  
+                    <option value="4">Submitted</option>
+                  
+                    <option value="5">PartsIdentified</option>
+                  
+                    <option value="6">Dispositioned</option>
+                  
+                    <option value="7">Completed</option>
+                  
+                  
+                </select></td>
+              <td style="color:#000000; font-size:10px; background-color:white;">Hold ctrl for multiple choices</td>
+            </tr>
+            <tr bgcolor="lightyellow">
+              <td colspan="3" class="redtext" height="3">Hold down the Ctrl Button for selecting multiple fields below</td>
+              <td style="color:#FF0000; font-size:10px; background-color:white;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="leftcol" valign="top">View Fields:</td>
+              <td colspan="2" bgcolor="white" valign="bottom">
+                
+                
+                
+                
+                <select style="width:274px;" name="field_names" multiple="multiple" size="7">
+                  <option value="tt.site as Site" selected="selected">Site</option>
+                  <option value="tt.try_no as Try" selected="selected">Try No</option>
+                  <option value="ts.description as Status" selected="selected">Status</option>
+                  <option value="tt.work_order_id as WO_ID" selected="selected">Work Order ID</option>
+                  <option value="tt.po_no as PO">PO No</option>
+                  <option value="tt.po_line as Line">PO Line</option>
+                  <option value="tl.test_name as Name" selected="selected">Test Name</option>
+                  <option value="tc.category as Category" selected="selected">Test Category</option>
+                  <option value="tfl.modified_by as Technician">Technician</option>
+                  <option value="tfl.submitted_date as SubmittedDate">Submitted Date</option>
+                  <option value="tfl.dispositioned_by as Engineer" selected="selected">Engineer</option>
+                  <option value="tfl.disposition_date as DispositionDate">Disposition Date</option>
+                  <option value="do.disposition_text as DispositionResultText">Disposition Result</option>
+                  <option value="tfl.disposition_remarks as DispositionRemarks">Disposition Remarks</option>
+                  <option value="tt.work_order_no as WorkOrder">Work Order No</option>
+                  <option value="tt.work_center as WorkCenter">Work Center</option>
+                  <option value="tt.operation_no as Op">Operation No</option>
+                  <option value="tfl.repeat_operations as RepeatOperations">Repeat Operations</option>
+                  <option value="tt.part_no as Part" selected="selected">Part Number</option>
+                  <option value="tt.part_desc as PartDescription">Part Description</option>
+                  <option value="tt.part_rev as Rev">Revision</option>
+                  <option value="pl.department as Department" selected="selected">Department</option>
+                  <option value="tt.product_line as ProdLine">Product Line Code</option>
+                  <option value="tt.product_line_desc as PLDescription">Product Line Description</option>
+									
+									<option value="tt.project_name as ProjectName">Project Name</option>
+                  <option value="tt.serial_no as SerialNo" selected="selected">Serial No</option>
+                  <option value="tt.parent_serial as ParentSerial">Parent Serial</option>
+                  <option value="tt.supplier_no as SupplierNo">Supplier No</option>
+                  <option value="tt.supplier_name as SupplierName">Supplier Name</option>
+                  <option value="tt.performed_date as PerformedDate">Performed Date/Time</option>
+                  <option value="tfl.modified_date as ModifiedDate">Modified Date/Time</option>
+                  <option value="tfl.remarks as Remarks">Remarks</option>
+                </select>
+                
+              </td>
+              <td style="color:#FF0000; font-size:10px; background-color:white;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td colspan="2" align="center"><input value="Select All" name="sabutton" onclick="selectAll()" type="button">
+                <input value="Clear All" name="snbutton" onclick="unselectAll()" type="button">
+                
+                <input value="Defaults" name="snbutton" onclick="Defaults('0','')" type="button"></td>
+              <td style="color:#FF0000; font-size:10px; background-color:white;">&nbsp;</td>
+            </tr>
+          </tbody></table>
+          </td>
+        </tr>
+      </tbody></table>
+      <br>
+      <input value="Reset" onclick="resetUsers('inspector','modified_by');resetUsers('engineer','dispositioned_by');resetProductLines();resetDepartments();return enableTextFields(form1);" type="reset">
+      <input value="Submit" type="submit">
+      <br>
+      
+      
+      
+      
+        <p class="regular"> <input name="saveSearch" onclick="return openSaveQueryWindow('/support/saveQuery.cfm?module=TFL');" type="checkbox">Save My Query</p>
+      
+      <input name="searchId" value="" type="hidden">
+      <input name="queryName" value="" type="hidden">
+      <input name="fromSave" value="0" type="hidden">
+      <input name="queryCriteria" value="" type="hidden">
+      <input name="searchFields" value="" type="hidden">
+      
+    </form>
+    <p class="regular"><a href="http://equality-eur.slb.com/menu.cfm">Back</a> to Main Menu</p>
+  </div>
+  
+  
+</body></html>

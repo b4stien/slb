@@ -1,0 +1,370 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="charset" content="utf-8">
+	
+	
+		<script language="javascript">
+			if ((top != self) && parent.frames[1].name == 'toolbar'){ parent.frames[1].location.href = "http://equality-eur.slb.com/toolbar.cfm"; }
+		</script>
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<style type="text/css">
+		.menu1{
+			margin-left:5px;
+			padding-left:10px;
+			padding-top:2px;
+			padding-bottom: 2px;
+			display:block;
+			text-decoration: none;
+			color: #000000;
+			height: 25px;
+		}
+		
+		.submenu{
+			display: block;
+			margin-left: 20px;
+			padding-top: 2px;
+			padding-left:20px;
+			color: #333333;
+			display:block;
+			text-decoration: none;
+			height: 25px;
+		}
+		
+		.subsubmenu{
+			display: block;
+			height: 25px;
+			margin-left: 45px;
+			padding-top: 2px;
+			padding-left: 7px;
+			color: #C33;
+		}
+		.hide{
+			display: none;
+		}
+		
+		.show{
+			display: block;
+		}
+		
+		div.verticalMenu {
+			font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+		  font-size : 10pt;
+			padding-bottom: 10px;
+			background-color: RGB(0,51,102);
+		}
+		
+		div.verticalMenu div span {
+			display: block;
+			padding: 5px 25px;
+			/*font-weight: bold;*/
+			color: white;
+			cursor: default;
+			border-bottom: 1px solid #ddd;
+		}
+		
+		.spanExpanded{
+			background: url(images/menu_expanded.jpg) no-repeat 10px center;
+		}
+		.spanCollapsed{
+			background: url(images/menu_collapsed.jpg) no-repeat 10px center;
+		}
+		
+		div.verticalMenu div div a {
+			padding: 5px 10px;
+			display: block;
+			border-bottom: 1px solid #ddd;
+			color: white;
+		}
+		div.verticalMenu div a.current {
+			background : #ccc;
+		}
+		div.verticalMenu div a:hover {
+			background:RGB(49,106,197) url(images/menu_linkarrow.jpg) no-repeat right center;
+			color: #fff;
+			text-decoration: none;
+		}
+		</style>
+	
+		<script language="JavaScript" type="text/JavaScript">
+			menu_status = new Array();
+	
+			//Function to show or hide the sub list of the menu
+			function showHide(theid, spanId, action){
+				if (document.getElementById) {
+					var switch_id = document.getElementById(theid);
+					if(action == 'hide'){
+						switch_id.className = "hide";
+						menu_status[theid] = "hide";
+						if(spanId.indexOf('sub') == -1)
+							document.getElementById(spanId).className ='spanCollapsed menu1';
+						else
+							document.getElementById(spanId).className ='spanCollapsed submenu';
+					}
+					else{
+						if(menu_status[theid] != "show") {
+							switch_id.className = "show";
+							menu_status[theid] = "show";
+							if(spanId.indexOf('sub') == -1)
+								document.getElementById(spanId).className ='spanExpanded menu1';
+							else
+								document.getElementById(spanId).className ='spanExpanded submenu';
+						}
+						else{
+							switch_id.className = "hide";
+							menu_status[theid] = "hide";
+							if(spanId.indexOf('sub') == -1)
+								document.getElementById(spanId).className ='spanCollapsed menu1';
+							else
+								document.getElementById(spanId).className ='spanCollapsed submenu';
+						}
+					}
+					if(document.body.clientHeight <= document.getElementById('vertical_menu').offsetHeight)
+						parent.document.frames[2].document.body.scroll = 'yes';
+					else
+						parent.document.frames[2].document.body.scroll = 'no';
+				}
+			}
+	
+			//Function added to show and hide the vertical menu frame on click of a button
+			var show=false;
+			function toggleContents() {
+				if (show) {
+					parent.document.all.masterFrameset.cols = "16%,*"; // Display the table of contents
+					//parent.document.frames[2].document.body.scroll = 'auto';
+					document.getElementById('vertical_menu').style.visibility='visible';
+					document.getElementById('btnShowHideMenu').value='<';
+					document.getElementById('btnShowHideMenu').title = 'Hide Menu';
+					document.getElementById('divToggleButton').align='right';
+					if(navigator.appName != "Netscape"){ //Scroll is auto in firefox. so this code is only needed for IE
+						if(document.body.clientHeight <= document.getElementById('vertical_menu').offsetHeight)
+							parent.document.frames[2].document.body.scroll = 'yes';
+						else
+							parent.document.frames[2].document.body.scroll = 'no';
+					}
+					show = false;
+				}
+				else{
+					// Scroll bar does not go in firefox when frame is closed. So increased the size of frame to make the button visible
+					if(navigator.appName == "Netscape")
+						parent.document.all.masterFrameset.cols = "3%,*" ;
+					else{
+						parent.document.all.masterFrameset.cols = "1.5%,*" ;
+						parent.document.frames[2].document.body.scroll = 'no';
+					}
+					// Hide the table of contents
+					document.getElementById('vertical_menu').style.visibility='hidden';
+					document.getElementById('btnShowHideMenu').value='>';
+					document.getElementById('btnShowHideMenu').title = 'Show Menu';
+					document.getElementById('divToggleButton').align='left';
+					//parent.document.frames[2].document.body.scroll = 'no';
+					show= true;
+				}
+			}
+	
+			//Function added to show the link highlighted when it is clicked
+			selectedLink ='';
+			function fnSelectLink(obj,hoverOver){
+				arrLinks = document.getElementsByTagName('a');
+				if(!hoverOver)
+					selectedLink = obj.id;
+				for(i=0;i<arrLinks.length;i++){
+					if(arrLinks[i].id != selectedLink)
+						arrLinks[i].style.background = '';
+				}
+			
+				if(obj){
+					obj.style.color ='#fff';
+					obj.style.background = 'RGB(49,106,197) url(images/menu_linkarrow.jpg) no-repeat right center';
+				}
+			}
+			function fnDeselectLink(obj){
+				if(obj.id != selectedLink)
+				obj.style.background='';
+			}
+			function setDivWidth(){
+				if(navigator.appName == "Netscape")
+					document.getElementById('vertical_menu').style.width='200px';
+			}
+		</script>
+	</head>
+	
+	<body onload="setDivWidth()">
+		
+		
+			<div id="divToggleButton" style="background-color: RGB(0,51,102);" align="right"><input style="background-color:gray; color:white" id="btnShowHideMenu" name="btnShowHideMenu" onclick="toggleContents()" title="Hide Menu" value="&lt;" type="button"></div>
+			<div id="vertical_menu" class="verticalMenu" style="visibility: visible; width: 200px;">
+			
+			
+				<div>
+					<span onclick="showHide('mymenu1','span1')" class="spanCollapsed menu1" id="span1">Daily Inspection</span>
+					<div id="mymenu1" class="hide">
+						
+							<a href="http://equality-eur.slb.com/get_mfgpro.cfm?go=daily" id="di_create" class="submenu" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Create</a>
+					  	
+						<a href="http://equality-eur.slb.com/daily_inspect/daily_inspection.cfm" id="di_query" class="submenu" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Query</a>
+					</div>
+				</div>
+				
+			  	<div>
+					<span onclick="showHide('mymenu4','span4')" class="spanCollapsed menu1" id="span4">IFR/RON Ticket</span>
+					<div id="mymenu4" class="hide">
+						
+							<a href="http://equality-eur.slb.com/get_mfgpro.cfm?go=ron" class="submenu" id="ron_create" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Create</a>
+			  			
+						<a href="http://equality-eur.slb.com/ron/ron.cfm" class="submenu" id="ron_query" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Query</a>
+						<a href="http://equality-eur.slb.com/ron/ron.cfm?eron_status=%27Created%27" id="ron_submitted" class="submenu" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Submitted</a>
+					  	<a href="http://equality-eur.slb.com/ron/ron.cfm?eron_status=%27Submitted%27" id="ron_dispositioned" class="submenu" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Dispositioned</a>
+						<a href="http://equality-eur.slb.com/ron/ron.cfm?eron_status=%27Dispositioned%27" id="ron_completed" class="submenu" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)"> Completed</a>
+					</div>
+		  		</div>
+				
+		  		<div>
+					<span onclick="showHide('mymenu7','span7')" class="spanCollapsed menu1" id="span7">MATS</span>
+					<div id="mymenu7" class="hide">
+						<span onclick="showHide('SubLvl2Menu1','subSpan1')" class="spanCollapsed submenu" id="subSpan1">Perform MATS</span>
+			  			<div id="SubLvl2Menu1" class="hide">
+							
+				  				<a href="http://equality-eur.slb.com/get_mfgpro.cfm?go=Mats" class="subsubmenu" id="mats_create" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Create</a>
+				  				<a href="http://equality-eur.slb.com/get_mfgpro.cfm?go=HVM" class="subsubmenu" id="mats_hvm_create" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Create HVM</a>
+							
+							<a href="http://equality-eur.slb.com/MatsTest/test_perform.cfm" id="mats_query" class="subsubmenu" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Query</a>
+				  		</div>
+			  			<span onclick="showHide('SubLvl2Menu2','subSpan2')" class="spanCollapsed submenu" id="subSpan2">Define MATS</span>
+			  			<div id="SubLvl2Menu2" class="hide">
+							
+				  				<a href="http://equality-eur.slb.com/MatsTest/test_list_edit.cfm?action=add" class="subsubmenu" id="mats_test_create" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Create</a>
+							
+							<a href="http://equality-eur.slb.com/MatsTest/test_list.cfm" class="subsubmenu" id="mats_test_query" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Query</a>
+			  			</div>
+			  			<span onclick="showHide('SubLvl2Menu3','subSpan3')" class="spanCollapsed submenu" id="subSpan3">Test Fail Log</span>
+			  			<div id="SubLvl2Menu3" class="hide">
+							<a href="http://equality-eur.slb.com/MatsTest/test_fail_log.cfm" class="subsubmenu" id="tfl_query" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Query</a>
+			  			</div>
+					</div>
+		  		</div>
+		  	
+		  	<div>
+				<span onclick="showHide('mymenu8','span8')" class="spanCollapsed menu1" id="span8">Rework Ticket</span>
+				<div id="mymenu8" class="hide">
+					<a href="http://equality-eur.slb.com/rework/rework.cfm" class="submenu" id="rework_query" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Query</a>
+				</div>
+			</div>
+		  	<div>
+				<span onclick="showHide('mymenu9','span9')" class="spanCollapsed menu1" id="span9">Scrap Ticket</span>
+				<div id="mymenu9" class="hide">
+					<a href="http://equality-eur.slb.com/scrap/scrap.cfm" class="submenu" id="scrap_query" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Query</a>
+				</div>
+			</div>
+		  	<div>
+				<span onclick="showHide('mymenu10','span10')" class="spanCollapsed menu1" id="span10">eWaiver</span>
+				<div id="mymenu10" class="hide">
+					
+						<a href="http://equality-eur.slb.com/waiver/waiver_create.cfm" class="submenu" id="waiver_create" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Create</a>
+				  	
+					<a href="http://equality-eur.slb.com/waiver/waiver.cfm" class="submenu" id="waiver_query" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Query</a>
+			  		<a href="http://equality-eur.slb.com/waiver/waiver.cfm?waiver_status=Created" class="submenu" id="waiver_submitted" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Submitted</a>
+			  		<a href="http://equality-eur.slb.com/waiver/waiver.cfm?waiver_status=Submitted" class="submenu" id="waiver_dispositioned" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Dispositioned</a>
+			  		<a href="http://equality-eur.slb.com/waiver/waiver.cfm?waiver_status=Dispositioned" class="submenu" id="waiver_completed" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Completed</a>
+				</div>
+		  	</div>
+		  	<div>
+				<span onclick="showHide('mymenu11','span11')" class="spanCollapsed menu1" id="span11">Calibration</span>
+				<div id="mymenu11" class="hide">
+					<span onclick="showHide('SubLvl2Menu4','subSpan4')" class="spanCollapsed submenu" id="subSpan4">Equipment</span>
+						<div id="SubLvl2Menu4" class="hide">
+							
+						  		<a href="http://equality-eur.slb.com/calibration/equipment_edit.cfm?CreateEqp=1" class="subsubmenu" id="equip_create" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Create</a>
+							
+							<a href="http://equality-eur.slb.com/calibration/equipment.cfm" id="equip_query" class="subsubmenu" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Query</a>
+						</div>
+						<span onclick="showHide('SubLvl2Menu5','subSpan5')" class="spanCollapsed submenu" id="subSpan5">Calibration Process</span>
+						<div id="SubLvl2Menu5" class="hide">
+							
+								<a href="http://equality-eur.slb.com/calibration/calibration_proc_edit.cfm" class="subsubmenu" id="calib_create" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Create</a>
+							
+							<a href="http://equality-eur.slb.com/calibration/calibration_proc.cfm" class="subsubmenu" id="calib_query" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Query</a>
+						</div>
+			  			<span onclick="showHide('SubLvl2Menu6','subSpan6')" class="spanCollapsed submenu" id="subSpan6">Calibration Result</span>
+			  			<div id="SubLvl2Menu6" class="hide">
+							
+				  				<a href="http://equality-eur.slb.com/calibration/calibration_result_edit.cfm?CreateCalResult=1" class="subsubmenu" id="calibResult_create" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Create</a>
+							
+							<a href="http://equality-eur.slb.com/calibration/calibration_result.cfm" class="subsubmenu" id="calibResult_query" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Query</a>
+			  			</div>
+			  			<a href="http://equality-eur.slb.com/calibration/calibration_canned_report.cfm" class="submenu" id="canned_reports" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Calibration Due Reports</a>
+					</div>
+		  		</div>
+		  
+		  		
+			  	<div>
+			  		<span onclick="showHide('mymenu12','span12')" class="spanCollapsed menu1" id="span12">Reports</span>
+					<div id="mymenu12" class="hide">
+						<span onclick="showHide('SubLvl2Menu7','subSpan7')" class="spanCollapsed submenu" id="subSpan7">View</span>
+						<div id="SubLvl2Menu7" class="hide">
+							<a href="http://equality-eur.slb.com/qpm/qpm_main.cfm" class="subsubmenu" id="report_qpm" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">QPM</a>
+							<a href="http://equality-eur.slb.com/MatsTest/footprint.cfm" class="subsubmenu" id="report_footprint" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Footprint</a>
+							<a href="http://equality-eur.slb.com/reports/rework_root/" class="subsubmenu" id="report_r1" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Rework Root Cause<br>Analysis</a>
+							<a href="http://equality-eur.slb.com/reports/scrap_root/" class="subsubmenu" id="report_r2" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Scrap Root Cause<br>Analysis</a>
+							<a href="http://equality-eur.slb.com/reports/rework_defect/" class="subsubmenu" id="report_r3" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Rework Defect Code<br>Analysis</a>
+							<a href="http://equality-eur.slb.com/reports/scrap_defect/" class="subsubmenu" id="report_r4" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Scrap Defect Code<br>Analysis</a>
+							<a href="http://equality-eur.slb.com/reports/rework_time/" class="subsubmenu" id="report_r5" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Rework Cost Over Time</a>
+							<a href="http://equality-eur.slb.com/reports/scrap_time/" class="subsubmenu" id="report_r6" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Scrap Cost Over Time</a>
+							<a href="http://equality-eur.slb.com/reports/first_past/" class="subsubmenu" id="report_r7" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">1st Pass Yield in<br>Inspection</a>
+							<a href="http://equality-eur.slb.com/reports/sr_rates/" class="subsubmenu" id="report_r8" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Scrap/Rework Rates<br>over Time</a>
+							<a href="http://equality-eur.slb.com/reports/scrap_rates/" class="subsubmenu" id="report_r9" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Scrap Rates</a>
+							<a href="http://equality-eur.slb.com/reports/insp_count/" class="subsubmenu" id="report_r10" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Number of Inspections</a>
+							<a href="http://equality-eur.slb.com/reports/scrap_count/" class="subsubmenu" id="report_r11" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Scrap Count</a>
+							<a href="http://equality-eur.slb.com/reports/rework_count/" class="subsubmenu" id="report_r12" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Rework Count</a>
+							<a href="http://equality-eur.slb.com/reports/kpi.cfm" class="subsubmenu" id="report_r13" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">eQuality KPI</a>
+							<a href="http://equality-eur.slb.com/reports/mats_audit/" class="subsubmenu" id="report_r14" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">MATS Audit</a>			
+							<a href="http://equality-eur.slb.com/reports/pending_actions/pending_actions.cfm" class="subsubmenu" id="report_r16" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">My Pending Actions</a>
+							<a href="http://equality-eur.slb.com/reports/calibration/equipment_usage.cfm" class="subsubmenu" id="report_r17" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Equipment Usage</a>
+						</div>
+					  	
+							<a href="http://equality-eur.slb.com/MatsTest/footprint.cfm" class="submenu" id="report_footprint1" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Footprint</a>
+							<a href="http://equality-eur.slb.com/MatsTest/check_traceability.cfm" class="submenu" id="traceability" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Traceability</a>
+							<a href="http://equality-eur.slb.com/MatsTest/check_usage.cfm" class="submenu" id="mats_usage" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Usage</a>
+					  	
+			  			<a href="http://equality-eur.slb.com/reports/pending_actions/pending_actions.cfm" class="submenu" id="pending_actions" target="main_menu" onclick="fnSelectLink(this)" onmouseover="fnSelectLink(this,1)" onmouseout="fnDeselectLink(this)">Pending Actions</a>
+					</div>
+			  	</div>
+					
+				
+			</div>
+		
+	
+
+</body></html>

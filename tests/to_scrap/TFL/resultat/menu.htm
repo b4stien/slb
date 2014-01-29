@@ -1,0 +1,759 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"><meta http-equiv="charset" content="utf-8">
+	
+	
+		<script language="javascript">
+			if ((top != self) && parent.frames[1].name == 'toolbar'){ parent.frames[1].location.href = "http://equality-eur.slb.com/toolbar.cfm"; }
+		</script>
+	
+
+<script type="text/javascript" src="menu_data/ajax.js"></script>
+<script type="text/javascript" src="menu_data/ajax_users.js"></script>
+<script type="text/javascript" src="menu_data/ajax_productlines.js"></script>
+<script type="text/javascript" src="menu_data/ajax_departments.js"></script>
+<script type="text/javascript" src="menu_data/search.js"></script>
+
+
+
+  
+  
+  
+  <title>View Test Fail Log</title>
+  <link rel="stylesheet" href="menu_data/eQ.css">
+  </head><body><p class="header" align="center">View Test Fail Log</p>
+  
+  
+  <div class="regular" align="center">
+		<form name="obform" action="/MatsTest/test_fail_log.cfm" method="post">
+			
+	
+	<script language="JavaScript" type="text/javascript">
+		// java script function for showing up different pages
+		var whitespace = " \t\n\r";
+		function Getrows(formnames,from,to,startpage,endpage,pagenum)
+		{			
+			if(formnames == 'obform')
+			{
+				document.obform.startrow.value=from;
+				document.obform.endrow.value=to;
+				document.obform.startpage.value=startpage;
+				document.obform.endpage.value=endpage;
+				document.obform.pagenum.value=pagenum;
+				obform.submit();
+			}
+		}
+	
+		function More(formnames,startpage,endpage,displaysize)
+		{
+			if(formnames == 'obform')
+			{
+				document.obform.startpage.value= startpage;
+				document.obform.endpage.value= endpage;		
+				document.obform.startrow.value= ((startpage-1) * displaysize) +1;
+				document.obform.endrow.value= ((startpage-1) * displaysize) +displaysize;
+				document.obform.pagenum.value=startpage;		
+				document.obform.submit();
+			}
+		}
+	
+		function Previous(formnames,startpage,endpage,displaysize)
+		{
+			if(formnames == 'obform')
+			{
+				document.obform.startpage.value= startpage;
+				document.obform.endpage.value= endpage;
+		
+				if (startpage ==1)
+				{
+					document.obform.startrow.value=1;
+					document.obform.endrow.value= displaysize;
+					document.obform.pagenum.value=1;
+				}
+				 else
+				{
+					document.obform.startrow.value= ((startpage-1) * displaysize) +1;
+					document.obform.endrow.value= ((startpage-1) * displaysize) +displaysize;
+					document.obform.pagenum.value=startpage;
+				}
+				document.obform.submit();
+			}
+		}
+		
+		function isEmpty(s)		
+		{			
+			return ((s == null) || (s.length == 0))
+		}
+	
+		function isWhitespace(s)
+		{
+	
+		    var i;
+			if (isEmpty(s)) return true;
+	
+		    for (i = 0; i < s.length; i++)
+		    {
+		         // Check that current character isn't whitespace.
+		         var c = s.charAt(i);
+		 	     if (whitespace.indexOf(c) == -1) return false;
+		  	}
+		    alert(s);
+			// All characters are whitespace.
+		    return true;
+		}
+	
+		function onKeyPressSubmitFind(e)
+		{
+			var keycode;
+	
+			if (window.event) keycode = window.event.keyCode;
+			else if (e) keycode = e.which;
+			else return true;
+	
+			if (keycode == 13)
+	   		{
+	   			return false;
+	   		}
+			else
+	   		return true;
+		}
+	</script>
+	
+	<input name="startrow" id="startrow" value="1" type="Hidden">
+	<input name="endrow" id="endrow" value="3" type="Hidden">
+	<input name="startpage" id="startpage" value="1" type="Hidden">
+	<input name="endpage" id="endpage" value="2" type="Hidden">
+	<input name="pagenum" id="pagenum" value="1" type="Hidden">
+	<input name="retrnpage" id="retrnpage" value="0" type="Hidden">
+
+			<table>
+				<tbody><tr>
+					<td colspan="5">
+		<font color="black"><b>Page&nbsp;</b></font>
+		<font color="black"><b>1</b></font>
+		<font color="black">&nbsp;of&nbsp;&nbsp;[</font><font color="black"><b>1</b></font><font color="black">]</font>
+		
+			&nbsp; &nbsp; &nbsp; &nbsp; 
+			<font color="black"><strong>Rows 1</strong></font> <font color="black">to</font> <font color="black"><strong>3</strong></font> <font color="black">of</font> <font color="black"><strong>3</strong></font>
+		</td>
+				</tr>
+			</tbody></table>
+			<table width="70%">
+				<tbody><tr>
+					<td align="right" width="40%">Your Query Produced: <b>3 </b>Records</td>
+					<td align="right" width="40%"><a href="http://equality-eur.slb.com/MatsTest/test_fail_log.cfm">Return</a> to Search Page</td>
+					<td width="33%">&nbsp;</td>
+				</tr>
+			</tbody></table>
+			
+			
+			
+			<table border="1">
+				<tbody><tr>        
+					
+						<input name="field_names" value="tfl.test_taken_id as TakenID, tt.test_id as TestID, tt.test_version as Version, tfl.modified_date as Dated, tt.site as Site,tt.try_no as Try,ts.description as Status,tt.work_order_id as WO_ID,tt.po_no as PO,tt.po_line as Line,tl.test_name as Name,tc.category as Category,tfl.modified_by as Technician,tfl.submitted_date as SubmittedDate,tfl.dispositioned_by as Engineer,tfl.disposition_date as DispositionDate,do.disposition_text as DispositionResultText,tfl.disposition_remarks as DispositionRemarks,tt.work_order_no as WorkOrder,tt.work_center as WorkCenter,tt.operation_no as Op,tfl.repeat_operations as RepeatOperations,tt.part_no as Part,tt.part_desc as PartDescription,tt.part_rev as Rev,pl.department as Department,tt.product_line as ProdLine,tt.product_line_desc as PLDescription,tt.project_name as ProjectName,tt.serial_no as SerialNo,tt.parent_serial as ParentSerial,tt.supplier_no as SupplierNo,tt.supplier_name as SupplierName,tt.performed_date as PerformedDate,tfl.modified_date as ModifiedDate,tfl.remarks as Remarks" type="hidden">
+						<input name="column_names" value="TakenID,TestID,Version,Dated,Site,Try,Status,WO_ID,PO,Line,Name,Category,Technician,SubmittedDate,Engineer,DispositionDate,DispositionResultText,DispositionRemarks,WorkOrder,WorkCenter,Op,RepeatOperations,Part,PartDescription,Rev,Department,ProdLine,PLDescription,ProjectName,SerialNo,ParentSerial,SupplierNo,SupplierName,PerformedDate,ModifiedDate,Remarks,ifr_count" type="hidden">
+						<input name="paramlist" value="tfl.test_status = ts.status and tt.test_id = tl.test_id and tt.site = tl.site and tt.test_version = tl.test_version and tfl.test_taken_id = tt.test_taken_id and tfl.test_taken_id IN ('3401808','3401812','3401817') and tt.site = 'MFG'" type="hidden">
+						<input name="orderby" value="TakenID asc" type="hidden">
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='TakenID%20desc';%20obform.submit();">
+									TakenID 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='TestID%20asc';%20obform.submit();">
+									TestID 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='Version%20asc';%20obform.submit();">
+									Version 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='Dated%20asc';%20obform.submit();">
+									Dated 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='Site%20asc';%20obform.submit();">
+									Site 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='Try%20asc';%20obform.submit();">
+									Try 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='Status%20asc';%20obform.submit();">
+									Status 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='WO_ID%20asc';%20obform.submit();">
+									WO_ID 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='PO%20asc';%20obform.submit();">
+									PO 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='Line%20asc';%20obform.submit();">
+									Line 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='Name%20asc';%20obform.submit();">
+									Name 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='Category%20asc';%20obform.submit();">
+									Category 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='Technician%20asc';%20obform.submit();">
+									Technician 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='SubmittedDate%20asc';%20obform.submit();">
+									SubmittedDate 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='Engineer%20asc';%20obform.submit();">
+									Engineer 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='DispositionDate%20asc';%20obform.submit();">
+									DispositionDate 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='DispositionResultText%20asc';%20obform.submit();">
+									
+										DispositionResult
+									
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='DispositionRemarks%20asc';%20obform.submit();">
+									DispositionRemarks 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='WorkOrder%20asc';%20obform.submit();">
+									WorkOrder 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='WorkCenter%20asc';%20obform.submit();">
+									WorkCenter 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='Op%20asc';%20obform.submit();">
+									Op 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='RepeatOperations%20asc';%20obform.submit();">
+									RepeatOperations 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='Part%20asc';%20obform.submit();">
+									Part 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='PartDescription%20asc';%20obform.submit();">
+									PartDescription 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='Rev%20asc';%20obform.submit();">
+									Rev 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='Department%20asc';%20obform.submit();">
+									Department 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='ProdLine%20asc';%20obform.submit();">
+									ProdLine 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='PLDescription%20asc';%20obform.submit();">
+									PLDescription 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='ProjectName%20asc';%20obform.submit();">
+									ProjectName 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='SerialNo%20asc';%20obform.submit();">
+									SerialNo 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='ParentSerial%20asc';%20obform.submit();">
+									ParentSerial 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='SupplierNo%20asc';%20obform.submit();">
+									SupplierNo 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='SupplierName%20asc';%20obform.submit();">
+									SupplierName 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='PerformedDate%20asc';%20obform.submit();">
+									PerformedDate 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='ModifiedDate%20asc';%20obform.submit();">
+									ModifiedDate 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='Remarks%20asc';%20obform.submit();">
+									Remarks 
+								</a>
+							
+						</th>																						
+					
+						<th nowrap="nowrap">
+							
+								<a href="javascript:obform.orderby.value='ifr_count%20asc';%20obform.submit();">
+									
+										IFR Count
+									
+								</a>
+							
+						</th>																						
+					
+					<th>Fail Log</th>
+					<th>Test Taken</th>
+				</tr>
+				
+					<tr>
+						
+									<td>3401808&nbsp;</td>								
+								
+									<td><a href="http://equality-eur.slb.com/MatsTest/test_questions_edit.cfm?action=view&amp;test_id=29140&amp;test_version=5" target="_blank">29140</a></td>
+								
+									<td>5&nbsp;</td>								
+								
+									<td nowrap="nowrap">02-Dec-2013</td>
+								
+									<td>MFG&nbsp;</td>								
+								
+									<td>5&nbsp;</td>								
+								
+									<td>Completed&nbsp;</td>								
+								
+									<td>93716768&nbsp;</td>								
+								
+									<td>&nbsp;</td>								
+								
+									<td>&nbsp;</td>								
+								
+									<td>Calibration &amp; Calibration check&nbsp;</td>								
+								
+									<td>Calibration&nbsp;</td>								
+								
+									<td>Sofian Ben Slim&nbsp;</td>								
+								
+									<td>2013-12-02 06:10:55.8&nbsp;</td>								
+								
+									<td>Sofian Ben Slim&nbsp;</td>								
+								
+									<td>2013-12-02 07:17:22.303&nbsp;</td>								
+								
+									<td>Acceptable (Use As Is)&nbsp;</td>								
+								
+									<td>*** SSlim 30 -11-2013 ***L’Accuracy’ est à la limite de la 
+tolérance .Les donnees de calibrations montrent des bonnes performances 
+métrologiques. Use as IS&nbsp;</td>								
+								
+									<td>564067-8&nbsp;</td>								
+								
+									<td>SRPC-ATT&nbsp;</td>								
+								
+									<td>1050&nbsp;</td>								
+								
+									<td>&nbsp;</td>								
+								
+									<td>100833657&nbsp;</td>								
+								
+									<td>TCQR-BA TESTING CRYSTALQUARTZ RECORDER&nbsp;</td>								
+								
+									<td>AF&nbsp;</td>								
+								
+									<td>WTS-DT&nbsp;</td>								
+								
+									<td>T011&nbsp;</td>								
+								
+									<td>Downhole Testing&nbsp;</td>								
+								
+									<td>DT_SUST&nbsp;</td>								
+								
+									<td>TCQR-BA.932&nbsp;</td>								
+								
+									<td>&nbsp;</td>								
+								
+									<td>&nbsp;</td>								
+								
+									<td>&nbsp;</td>								
+								
+									<td>02-Dec-2013&nbsp;6:09 AM</td>
+								
+									<td>02-Dec-2013&nbsp;7:17 AM</td>
+								
+									<td>Pc-Pe=1.12psi T4 P9&nbsp;</td>								
+								
+									<td>0</td>
+								
+							<td>
+								
+									<a href="http://equality-eur.slb.com/MatsTest/test_fail_log_edit.cfm?action=view&amp;test_taken_id=3401808"><img src="menu_data/eQ_button_details.jpg" alt="Fail Log Details" border="0" width="43" height="18"></a>
+									
+							</td>
+							<td>
+								<a href="http://equality-eur.slb.com/MatsTest/test_perform_edit.cfm?action=view&amp;test_taken_id=3401808"><img src="menu_data/eQ_button_details.jpg" alt="Details" border="0" width="43" height="18"></a>
+							</td>
+						 
+					</tr>
+				
+					<tr>
+						
+									<td>3401812&nbsp;</td>								
+								
+									<td><a href="http://equality-eur.slb.com/MatsTest/test_questions_edit.cfm?action=view&amp;test_id=29140&amp;test_version=5" target="_blank">29140</a></td>
+								
+									<td>5&nbsp;</td>								
+								
+									<td nowrap="nowrap">02-Dec-2013</td>
+								
+									<td>MFG&nbsp;</td>								
+								
+									<td>4&nbsp;</td>								
+								
+									<td>Completed&nbsp;</td>								
+								
+									<td>93716780&nbsp;</td>								
+								
+									<td>&nbsp;</td>								
+								
+									<td>&nbsp;</td>								
+								
+									<td>Calibration &amp; Calibration check&nbsp;</td>								
+								
+									<td>Calibration&nbsp;</td>								
+								
+									<td>Sofian Ben Slim&nbsp;</td>								
+								
+									<td>2013-12-02 06:14:05.74&nbsp;</td>								
+								
+									<td>Sofian Ben Slim&nbsp;</td>								
+								
+									<td>2013-12-02 07:16:42.227&nbsp;</td>								
+								
+									<td>Acceptable (Use As Is)&nbsp;</td>								
+								
+									<td>*** SSlim 30 -11-2013 ***L’Accuracy’ est à la limite de la 
+tolérance .Les donnes de calibrations montre des bonnes performances 
+métrologique. Use as IS&nbsp;</td>								
+								
+									<td>564067-11&nbsp;</td>								
+								
+									<td>SRPC-ATT&nbsp;</td>								
+								
+									<td>1050&nbsp;</td>								
+								
+									<td>&nbsp;</td>								
+								
+									<td>100833657&nbsp;</td>								
+								
+									<td>TCQR-BA TESTING CRYSTALQUARTZ RECORDER&nbsp;</td>								
+								
+									<td>AF&nbsp;</td>								
+								
+									<td>WTS-DT&nbsp;</td>								
+								
+									<td>T011&nbsp;</td>								
+								
+									<td>Downhole Testing&nbsp;</td>								
+								
+									<td>DT_SUST&nbsp;</td>								
+								
+									<td>TCQR-BA.935&nbsp;</td>								
+								
+									<td>&nbsp;</td>								
+								
+									<td>&nbsp;</td>								
+								
+									<td>&nbsp;</td>								
+								
+									<td>02-Dec-2013&nbsp;6:13 AM</td>
+								
+									<td>02-Dec-2013&nbsp;7:16 AM</td>
+								
+									<td>Pc-Pe=1.2psi T4P9&nbsp;</td>								
+								
+									<td>0</td>
+								
+							<td>
+								
+									<a href="http://equality-eur.slb.com/MatsTest/test_fail_log_edit.cfm?action=view&amp;test_taken_id=3401812"><img src="menu_data/eQ_button_details.jpg" alt="Fail Log Details" border="0" width="43" height="18"></a>
+									
+							</td>
+							<td>
+								<a href="http://equality-eur.slb.com/MatsTest/test_perform_edit.cfm?action=view&amp;test_taken_id=3401812"><img src="menu_data/eQ_button_details.jpg" alt="Details" border="0" width="43" height="18"></a>
+							</td>
+						 
+					</tr>
+				
+					<tr>
+						
+									<td>3401817&nbsp;</td>								
+								
+									<td><a href="http://equality-eur.slb.com/MatsTest/test_questions_edit.cfm?action=view&amp;test_id=29140&amp;test_version=5" target="_blank">29140</a></td>
+								
+									<td>5&nbsp;</td>								
+								
+									<td nowrap="nowrap">02-Dec-2013</td>
+								
+									<td>MFG&nbsp;</td>								
+								
+									<td>5&nbsp;</td>								
+								
+									<td>Submitted&nbsp;</td>								
+								
+									<td>93716741&nbsp;</td>								
+								
+									<td>&nbsp;</td>								
+								
+									<td>&nbsp;</td>								
+								
+									<td>Calibration &amp; Calibration check&nbsp;</td>								
+								
+									<td>Calibration&nbsp;</td>								
+								
+									<td>Xavier Gonzalez&nbsp;</td>								
+								
+									<td>2013-12-02 06:16:41.977&nbsp;</td>								
+								
+									<td>Sofian Ben Slim&nbsp;</td>								
+								
+									<td>&nbsp;</td>								
+								
+									<td>&nbsp;</td>								
+								
+									<td>&nbsp;</td>								
+								
+									<td>564062-13&nbsp;</td>								
+								
+									<td>SRPC-ATT&nbsp;</td>								
+								
+									<td>1050&nbsp;</td>								
+								
+									<td>&nbsp;</td>								
+								
+									<td>100833657&nbsp;</td>								
+								
+									<td>TCQR-BA TESTING CRYSTALQUARTZ RECORDER&nbsp;</td>								
+								
+									<td>AF&nbsp;</td>								
+								
+									<td>WTS-DT&nbsp;</td>								
+								
+									<td>T011&nbsp;</td>								
+								
+									<td>Downhole Testing&nbsp;</td>								
+								
+									<td>DT_SUST&nbsp;</td>								
+								
+									<td>TCQR-BA.920&nbsp;</td>								
+								
+									<td>&nbsp;</td>								
+								
+									<td>&nbsp;</td>								
+								
+									<td>&nbsp;</td>								
+								
+									<td>02-Dec-2013&nbsp;6:16 AM</td>
+								
+									<td>02-Dec-2013&nbsp;6:16 AM</td>
+								
+									<td>No data T1 en cal check.&nbsp;</td>								
+								
+									<td>0</td>
+								
+							<td>
+								
+									<a href="http://equality-eur.slb.com/MatsTest/test_fail_log_edit.cfm?action=view&amp;test_taken_id=3401817"><img src="menu_data/eQ_button_details.jpg" alt="Fail Log Details" border="0" width="43" height="18"></a>
+									
+										<a href="http://equality-eur.slb.com/MatsTest/test_fail_log_edit.cfm?action=edit&amp;test_taken_id=3401817"><img src="menu_data/eQ_button_edit.jpg" alt="Edit Fail Log" border="0" width="43" height="18"></a>
+									
+							</td>
+							<td>
+								<a href="http://equality-eur.slb.com/MatsTest/test_perform_edit.cfm?action=view&amp;test_taken_id=3401817"><img src="menu_data/eQ_button_details.jpg" alt="Details" border="0" width="43" height="18"></a>
+							</td>
+						 
+					</tr>
+				
+			</tbody></table>
+		</form>
+  
+    <form name="form1" method="post">
+      
+        <p class="regular"><input name="saveSearch" onclick="return openSaveQueryWindow('/support/saveQuery.cfm?module=TFL&amp;searchResult=1&amp;criteria=Test%20Taken%20ID%7CIn%7C3401808%2C3401812%2C3401817%3BSite%7C%3D%7CMFG%3ASRPC&amp;viewFields=TakenID%2CTestID%2CVersion%2CDated%2CSite%2CTry%2CStatus%2CWO%20ID%2CPO%2CLine%2CName%2CCategory%2CTechnician%2CSubmittedDate%2CEngineer%2CDispositionDate%2CDispositionResultText%2CDispositionRemarks%2CWorkOrder%2CWorkCenter%2COp%2CRepeatOperations%2CPart%2CPartDescription%2CRev%2CDepartment%2CProdLine%2CPLDescription%2CProjectName%2CSerialNo%2CParentSerial%2CSupplierNo%2CSupplierName%2CPerformedDate%2CModifiedDate%2CRemarks%2Cifr%20count');" type="checkbox">Save My Query </p>
+        <div id="message"></div>
+      
+    </form>
+    
+    
+      <form name="Build_Excel" action="/Build_Excel.cfm" method="post">
+        <input name="excel_sql" value="	select tfl.test_taken_id as TakenID, tt.test_id as TestID, tt.test_version as Version, tfl.modified_date as Dated, tt.site as Site,tt.try_no as Try,ts.description as Status,tt.work_order_id as WO_ID,tt.po_no as PO,tt.po_line as Line,tl.test_name as Name,tc.category as Category,tfl.modified_by as Technician,tfl.submitted_date as SubmittedDate,ISNULL(tfl.dispositioned_by,tfl.assigned_to) as Engineer,tfl.disposition_date as DispositionDate,do.disposition_text as DispositionResultText,tfl.disposition_remarks as DispositionRemarks,tt.work_order_no as WorkOrder,tt.work_center as WorkCenter,tt.operation_no as Op,tfl.repeat_operations as RepeatOperations,tt.part_no as Part,tt.part_desc as PartDescription,tt.part_rev as Rev,pl.department as Department,tt.product_line as ProdLine,tt.product_line_desc as PLDescription,tt.project_name as ProjectName,tt.serial_no as SerialNo,tt.parent_serial as ParentSerial,tt.supplier_no as SupplierNo,tt.supplier_name as SupplierName,tt.performed_date as PerformedDate,tfl.modified_date as ModifiedDate,tfl.remarks as Remarks, tfl.test_status as test_status,
+					count(tfb.ron_tkt) as ifr_count
+					from test_fail_log tfl 
+					LEFT OUTER JOIN test_fail_bom tfb on (tfl.test_taken_id = tfb.test_taken_id and tfb.ron_tkt is not null)
+					LEFT OUTER JOIN Disposition_options do on (tfl.disposition_result = do.disposition_option), 
+					test_taken tt left outer join ProductLine pl on (tt.product_line = pl.product_line and tt.site = pl.site), test_status ts, test_list tl, test_category tc 
+					where tc.category_id = tl.category_id and tfl.test_status = ts.status and tt.test_id = tl.test_id and tt.site = tl.site and tt.test_version = tl.test_version and tfl.test_taken_id = tt.test_taken_id and tfl.test_taken_id IN ('3401808','3401812','3401817') and tt.site = 'MFG'
+					GROUP BY tfl.test_taken_id , tt.test_id , tt.test_version , tfl.modified_date , tt.site ,tt.try_no ,ts.description ,tt.work_order_id ,tt.po_no ,tt.po_line ,tl.test_name ,tc.category ,tfl.modified_by ,tfl.submitted_date ,tfl.dispositioned_by ,tfl.disposition_date ,do.disposition_text ,tfl.disposition_remarks ,tt.work_order_no ,tt.work_center ,tt.operation_no ,tfl.repeat_operations ,tt.part_no ,tt.part_desc ,tt.part_rev ,pl.department ,tt.product_line ,tt.product_line_desc ,tt.project_name ,tt.serial_no ,tt.parent_serial ,tt.supplier_no ,tt.supplier_name ,tt.performed_date ,tfl.modified_date ,tfl.remarks ,tfl.dispositioned_by,tfl.assigned_to,tfl.test_status
+				 	order by TakenID asc" type="hidden">
+        <input name="column_names" value="TakenID,TestID,Version,Dated,Site,Try,Status,WO_ID,PO,Line,Name,Category,Technician,SubmittedDate,Engineer,DispositionDate,DispositionResultText,DispositionRemarks,WorkOrder,WorkCenter,Op,RepeatOperations,Part,PartDescription,Rev,Department,ProdLine,PLDescription,ProjectName,SerialNo,ParentSerial,SupplierNo,SupplierName,PerformedDate,ModifiedDate,Remarks,ifr_count" type="hidden">
+      </form>
+      <p class="irregular"><a href="javascript:Build_Excel.submit();">Export to Excel</a></p>
+      <p class="regular"><a href="http://equality-eur.slb.com/MatsTest/test_fail_log.cfm">Return</a> to Search Page</p>
+      <p class="regular"><a href="http://equality-eur.slb.com/menu.cfm">Back</a> to Main Menu</p>
+     </div>
+  
+  
+  </body></html>
