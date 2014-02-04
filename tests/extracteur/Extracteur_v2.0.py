@@ -1,4 +1,6 @@
-# Extracteur v1.0 
+# Extracteur v1.0
+
+# -*- coding: cp1252 -*-
 
 """  
 Some explanations of this script :
@@ -9,12 +11,13 @@ Some explanations of this script :
 2. use of TimeStamp
 
 """
-
+import os
 from collections import defaultdict
 import json
 import csv
 from HTMLParser import HTMLParser
 import datetime
+from selenium import webdriver
 
 # Controller to parse MATS test_perform query result HTML page.
 class matsQueryResultHTMLParser(HTMLParser):
@@ -82,7 +85,7 @@ class matsQueryResultHTMLParser(HTMLParser):
             self.table = True
             self.tablei += 1 # Tables counter.
             # if self.tablei == 3:
-            #     g_c.inc()
+                # g_c.inc()
         # Detect table lines (tr) nested in table (table).
         if tag == 'tr' and self.table:
             self.tr = True
@@ -245,12 +248,15 @@ def matsTimeStamp (matsTime):
 
 ########## Test with resultMats.htm #######################################
 
-with open ('resultMats.htm', 'r') as source:
-	pageWebSource = source.read()
+myDriver = webdriver.Firefox()
+myDriver.get("file:///C:/Users/Benjamin/Documents/Etudes/Centrale/Projet_Option/Schlumberger/tests/to_scrap/TFL/resultat/menu.htm")
 
 
-parser = matsQueryResultHTMLParser()
-nnn = parser.feed(pageWebSource)
+pageWebSource = myDriver.page_source.encode('utf-8')
+
+
+parser = matsQueryResultHTMLParser([3401783])
+parser.feed(pageWebSource)
 
 listResultByTakenID = parser.getResultByTakenID()
 
@@ -261,9 +267,9 @@ print listResultByTakenID
 # 	f1.write(stringResultByTakenID
 
 
-#writeHead doesn't work now!
+# writeHead doesn't work now!
 # csvHead = (['takenID'] + ['verifiedDate'] + ['serialNo'] + ['testID'] + ['Status'] + ['failLogLink'])
-listToCsv( 'Result_V2.csv', listResultByTakenID )
+# listToCsv( 'Result_V2.csv', listResultByTakenID )
 
 
  
