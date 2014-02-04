@@ -1,4 +1,4 @@
-# Extracteur v1.0 
+# Extracteur v2.0 
 
 """  
 Some explanations of this script :
