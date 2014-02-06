@@ -1,0 +1,98 @@
+{
+    "eq": {
+        "directUrl": "http://equality-eur.slb.com/index2.cfm?http://equality-eur.slb.com/",
+        "frameMainMenu": "main_menu",
+        "frameToolbar": "toolbar",
+        "imageLinkHome": "eQ_home.jpg",
+        "linkTextMorePages": "More->>",
+        "mats": {
+            "failLogLinkStart": "MatsTest/test_fail_log_edit.cfm?action=view&test_taken_id=",
+            "imageLinkPerform": "mats_perform_test_HV.jpg",
+            "queryInputPriority": [
+                "site",
+                "department"
+            ],
+            "queryInputTypes": {
+                "site": "select",
+                "department": "selectAjax",
+                "performed_date_Op": "select",
+                "modified_date_Op": "select"
+            },
+            "queryUrl": "MatsTest/test_perform.cfm",
+            "resultColumnHeadersConversion": {
+                "takenID": "TakenID",
+                "testID": "TestID",
+                "testVersion": "Version",
+                "takenDate": "Dated",
+                "site": "Site",
+                "tryNo": "Try",
+                "status": "Status",
+                "woID": "WO_ID",
+                "po": "PO",
+                "line": "Line",
+                "testName": "Name",
+                "category": "Category",
+                "technician": "Technician",
+                "wo": "WorkOrder",
+                "wc": "WorkCenter",
+                "operation": "Op",
+                "partNo": "Part",
+                "partDesc": "PartDescription",
+                "rev": "Rev",
+                "department": "Department",
+                "qaproc": "QAProc",
+                "prodLine": "ProdLine",
+                "plDesc": "PLDescription",
+                "project": "ProjectName",
+                "serialNo": "SerialNo",
+                "parentSN": "ParentSerial",
+                "supplierNo": "SupplierNo",
+                "supplierName": "SupplierName",
+                "performedDate": "PerformedDate",
+                "modifiedDate": "ModifiedDate",
+                "verifiedBy": "VerifiedBy",
+                "verifiedDate": "VerifiedDate",
+                "remarks": "Remarks",
+                "testEditLink": "testEditLink",
+                "failLogLink": "failLogLink"
+            },
+            "selectAllViewFields": "sabutton",
+            "testTakenLinkStart": "MatsTest/test_perform_edit.cfm?action=view&test_taken_id="
+        },
+        "url": "http://equality-eur.slb.com"
+    },
+    "lang": {
+        "dir": "./lang/",
+        "file": "en.txt"
+    },
+    "localDb": {
+        "dir": "/../db/",
+        "tasksFile": "tasksQueue.txt",
+        "dbFile": "result.csv",
+        "outputType": "csv",
+        "csvDelimiter": ";"
+    },
+    "sharedDb": {
+        "enabled": false,
+        "dir": "U:/sharedDb/",
+        "archiveDir": "archive/",
+        "fileSuffix": ".txt",
+        "snPrefix": "sn_",
+        "woidPrefix": "woid_"
+    },
+    "param": {
+        "tasks": [
+            "matsReadTestTakenList"
+        ],
+        "matsQueryBy": [
+            "serial_no",
+            "work_order_id",
+            "composite"
+        ],
+        "waitAjax": 3,
+        "waitLogin": 15,
+        "waitMainMenu": 5,
+        "windowHeight": 480,
+        "windowWidth": 640
+    }
+}
