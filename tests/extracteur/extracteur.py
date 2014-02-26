@@ -1,4 +1,4 @@
-# Extracteur v2.0 
+# Extracteur 
 
 """  
 Some explanations of this script :
@@ -21,6 +21,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
 import time
+import os
 
 # Controller to parse MATS test_perform query result HTML page.
 class matsQueryResultHTMLParser(HTMLParser):
@@ -232,27 +233,27 @@ class matsQueryResultHTMLParser(HTMLParser):
 #     if newKeyDict not in parentDict:
 #         parentDict[newKeyDict] = {}
 
-# def listToCsv ( csvFileName, listName):
-#     with open( csvFileName, 'wb') as f:
-#         writer = csv.writer(f)
-#         # writer.writerows(csvHead)
-#         writer.writerows(listName)
+def listToCsv ( csvFileName, listName):
+    with open(csvFileName, 'wb') as f:
+        writer = csv.writer(f, delimiter=',')
+        # writer.writerows(csvHead)
+        writer.writerows(listName)
 
-# def matsTimeStamp (matsTime):
+def matsTimeStamp (matsTime):
 
-#     # Problem with format of datetime "no-break space"
-#     # So add \xc2\xa0
-#     # But it causes another problem
+    # Problem with format of datetime "no-break space"
+    # So add \xc2\xa0
+    # But it causes another problem
 
-#     # thisMatsDateTime = datetime.datetime.strptime(matsTime, \
-#     #                                             '%d-%b-%Y %I:%M %p')
+    # thisMatsDateTime = datetime.datetime.strptime(matsTime, \
+    #                                             '%d-%b-%Y %I:%M %p')
 
-#     thisMatsDateTime = datetime.datetime.strptime(matsTime, \
-#                                                 '%d-%b-%Y\xc2\xa0%I:%M %p')
-#     epoch = datetime.datetime.utcfromtimestamp(0)
-#     delta = thisMatsDateTime - epoch
-#     thisMatsTimeStamp = int(delta.total_seconds())
-#     return thisMatsTimeStamp
+    thisMatsDateTime = datetime.datetime.strptime(matsTime, \
+                                                 '%d-%b-%Y\xc2\xa0%I:%M %p')
+    epoch = datetime.datetime.utcfromtimestamp(0)
+    delta = thisMatsDateTime - epoch
+    thisMatsTimeStamp = int(delta.total_seconds())
+    return str(thisMatsTimeStamp)
 
 
 # def switchToFrameMainMenu():
@@ -341,60 +342,33 @@ class matsQueryResultHTMLParser(HTMLParser):
 # with open ('resultMats.htm', 'r') as source:
 # 	pageWebSource = source.read()
 
-myDriver = webdriver.Firefox()
-myDriver.get('file:///C:/Users/Benjamin/Documents/Etudes/Centrale/Projet_Option/docs%20Boris/decembre/eQuality_files/menu.htm')
+myUrl = "file:///" + os.path.dirname(os.path.abspath(__file__)) + "/home.htm"
 
-#t = myDriver.find_element_by_name("main_menu")
-#myDriver.switch_to_frame(t)
+firefox = webdriver.Firefox()
+firefox.implicitly_wait(5)
+firefox.get(myUrl)
 
-#print "already switched"
 
-img = myDriver.find_element_by_xpath("//img[contains(@src, 'menu_data/mats_perform_test_HV.jpg')]")
-img2 = myDriver.find_element_by_xpath("//img[contains(@src, 'menu_data/mats_test_fail_log.jpg')]")
-ActionChains(myDriver).drag_and_drop(img, img2).perform()
-print img.get_attribute('src')
-test = ActionChains(myDriver)
+area = firefox.find_element_by_xpath("//area[contains(@alt, 'Query Performed Tests')]")
 
-test.move_to_element_with_offset(img, 168, 15).click()
-print "already offset"
-test.click()
-print "already clicked"
+test = ActionChains(firefox)
+test.click(area)
 test.perform()
-print "already performed"
-# Give some time for the click to take effect.
-time.sleep(3)
-
-
-#imgs = myDriver.find_elements_by_tag_name('img')
-#print "already looked for images"
-#print imgs
-#for img in imgs:
-#    
-#    print "already switched frame"
-#    if img.get_attribute("src") == 'menu_data/mats_perform_test_HV.jpg':
-#        
-#      print "already got the right image"
-#        test = ActionChains(myDriver)
-#        test.move_to_element_with_offset(img, 158, 1)
-#        print "already offset"
-#        test.click()
-#
-#        test.perform()
-#                    # Give some time for the click to take effect.
-#        time.sleep(3)
-#    else :        print "no match"
-
 
 listTakenIDRecherche = [3401783, 3401784, 3401787, 3401790, 3401803]
-myDriver.find_element_by_name('test_taken_id_Op').send_keys(listTakenIDRecherche)
 
-t = myDriver.find_element_by_name('sabutton')
+
+firefox.find_element_by_name('test_taken_id').send_keys(listTakenIDRecherche)
+
+t = firefox.find_element_by_name('sabutton')
 t.click()
 t.click() # Click twice in case the first click just re-focused the window.
     
-t.submit() # Submit the query form.
-WebDriverWait(myDriver, 10) # Wait for the query result page.
-pageWebSource = myDriver.page_source.encode('utf8')
+t.submit()
+
+
+
+pageWebSource = firefox.page_source.encode('utf8')
 
 
 parser = matsQueryResultHTMLParser()
@@ -411,7 +385,7 @@ print listResultByTakenID
 
 #writeHead doesn't work now!
 # csvHead = (['takenID'] + ['verifiedDate'] + ['serialNo'] + ['testID'] + ['Status'] + ['failLogLink'])
-listToCsv( 'Result_V2.csv', listResultByTakenID )
+listToCsv( 'Result_v3.csv', listResultByTakenID )
 
 
  
