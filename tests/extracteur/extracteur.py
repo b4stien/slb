@@ -180,19 +180,19 @@ class matsQueryResultHTMLParser(HTMLParser):
                 indexCol = self.listCol.index(self.tdi)
                 if self.tdi != self.failLogLinkCol:   
                     if self.result[indexCol] == '':
-                        self.result[indexCol] = data
+                        self.result[indexCol] = data.replace("\xc2\xa0", " ")
                     else:
-                        self.result[indexCol] += ' ' + data
+                        self.result[indexCol] += ' ' + data.replace("\xc2\xa0", " ")
 
                 
     def endOfTr(self):
         # If we have found all cells (td), then transfer temporary result
         # into classified result.
-        if self.tablei == 3 and self.tdi == self.lengthResultCol :
+        if self.tablei == 3 and self.tdi == self.lengthResultCol :            
             r = self.result
             # transform matsTime to matsTimeStamp
-            r[1] = matsTimeStamp(r[1])
-
+            r[1] = matsTimeStamp(r[1])            
+                          
             # woID = getDictKey(r, 'woID', 'None')
             # serialNo = getDictKey(r, 'serialNo', 'None')
             # takenID = getDictKey(r, 'takenID', 'None')
@@ -245,11 +245,11 @@ def matsTimeStamp (matsTime):
     # So add \xc2\xa0
     # But it causes another problem
 
-    # thisMatsDateTime = datetime.datetime.strptime(matsTime, \
-    #                                             '%d-%b-%Y %I:%M %p')
-
     thisMatsDateTime = datetime.datetime.strptime(matsTime, \
-                                                 '%d-%b-%Y\xc2\xa0%I:%M %p')
+                                                 '%d-%b-%Y %I:%M %p')
+
+    #thisMatsDateTime = datetime.datetime.strptime(matsTime, \
+    #                                             '%d-%b-%Y\xc2\xa0%I:%M %p')
     epoch = datetime.datetime.utcfromtimestamp(0)
     delta = thisMatsDateTime - epoch
     thisMatsTimeStamp = int(delta.total_seconds())
