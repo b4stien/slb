@@ -11,7 +11,11 @@ import os
 myUrl = "file:///" + os.path.dirname(os.path.abspath(__file__)) + "/home.htm"
 
 firefox = webdriver.Firefox()
+<<<<<<< HEAD
 firefox.implicitly_wait(5)
+=======
+firefox.implicitly_wait(3)
+>>>>>>> db574dbf12309a775a7d880e759fc36a153da071
 firefox.get(myUrl)
 
 
@@ -21,6 +25,7 @@ test = ActionChains(firefox)
 test.click(area)
 test.perform()
 
+<<<<<<< HEAD
 listTakenIDRecherche = [3401783, 3401784, 3401787, 3401790, 3401803]
 
 
@@ -32,5 +37,8 @@ t = firefox.find_element_by_name('sabutton')
 t.click()
 t.click() # Click twice in case the first click just re-focused the window.
     
+=======
+t = firefox.find_element_by_name("sabutton")
+>>>>>>> db574dbf12309a775a7d880e759fc36a153da071
 t.submit()
 
