@@ -1,2 +1,2 @@
 test = (euh) ->
-  console.log 'Test'
+  console.log 'caca'

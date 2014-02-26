@@ -1,6 +1,4 @@
-# Extracteur v1.0
-
-# -*- coding: cp1252 -*-
+# Extracteur v2.0 
 
 """  
 Some explanations of this script :
@@ -10,8 +8,10 @@ Some explanations of this script :
 
 2. use of TimeStamp
 
+3. #Problem with format of datetime "no-break space" ,it causes another problem
+
 """
-import os
+
 from collections import defaultdict
 import json
 import csv
@@ -85,7 +85,7 @@ class matsQueryResultHTMLParser(HTMLParser):
             self.table = True
             self.tablei += 1 # Tables counter.
             # if self.tablei == 3:
-                # g_c.inc()
+            #     g_c.inc()
         # Detect table lines (tr) nested in table (table).
         if tag == 'tr' and self.table:
             self.tr = True
@@ -236,8 +236,16 @@ def listToCsv ( csvFileName, listName):
         writer.writerows(listName)
 
 def matsTimeStamp (matsTime):
+
+    # Problem with format of datetime "no-break space"
+    # So add \xc2\xa0
+    # But it causes another problem
+
+    # thisMatsDateTime = datetime.datetime.strptime(matsTime, \
+    #                                             '%d-%b-%Y %I:%M %p')
+
     thisMatsDateTime = datetime.datetime.strptime(matsTime, \
-                                                '%d-%b-%Y %I:%M %p')
+                                                '%d-%b-%Y\xc2\xa0%I:%M %p')
     epoch = datetime.datetime.utcfromtimestamp(0)
     delta = thisMatsDateTime - epoch
     thisMatsTimeStamp = int(delta.total_seconds())
@@ -248,15 +256,16 @@ def matsTimeStamp (matsTime):
 
 ########## Test with resultMats.htm #######################################
 
+# with open ('resultMats.htm', 'r') as source:
+# 	pageWebSource = source.read()
+
 myDriver = webdriver.Firefox()
-myDriver.get("file:///C:/Users/Benjamin/Documents/Etudes/Centrale/Projet_Option/Schlumberger/tests/to_scrap/TFL/resultat/menu.htm")
+myDriver.get('file:///C:/Users/Benjamin/Documents/Etudes/Centrale/Projet_Option/Schlumberger/tests/extracteur/resultMats.htm')
+pageWebSource = myDriver.page_source.encode('utf8')
 
 
-pageWebSource = myDriver.page_source.encode('utf-8')
-
-
-parser = matsQueryResultHTMLParser([3401783])
-parser.feed(pageWebSource)
+parser = matsQueryResultHTMLParser()
+nnn = parser.feed(pageWebSource)
 
 listResultByTakenID = parser.getResultByTakenID()
 
@@ -267,9 +276,9 @@ print listResultByTakenID
 # 	f1.write(stringResultByTakenID
 
 
-# writeHead doesn't work now!
+#writeHead doesn't work now!
 # csvHead = (['takenID'] + ['verifiedDate'] + ['serialNo'] + ['testID'] + ['Status'] + ['failLogLink'])
-# listToCsv( 'Result_V2.csv', listResultByTakenID )
+listToCsv( 'Result_V2.csv', listResultByTakenID )
 
 
  

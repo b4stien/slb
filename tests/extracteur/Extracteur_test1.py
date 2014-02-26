@@ -1,18 +1,14 @@
+# goal : opening eQuality home page and clicking on MatsQuery to access search page
+
+# Selenium WebDriver modules
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
 
-
-myDriver = webdriver.Firefox()
-myDriver.get('file:///C:/Users/Benjamin/Documents/Etudes/Centrale/Projet_Option/docs%20Boris/decembre/eQuality_files/menu.htm')
-
-img = myDriver.find_element_by_xpath("//img[contains(@src, 'menu_data/mats_perform_test_HV.jpg')]")
-
-test = ActionChains(myDriver)
-
-test.move_to_element_with_offset(img, 168, 10).click().perform()
-test.click().perform()
-test.click().perform()
-
-test.click().perform()
-
-test.click().perform()
+firefox = webdriver.Firefox()
+firefox.get("http://www.google.ca")
+test = actionChains( firefox)
+element = firefox.find_element_by_id("gb_23")
+test.click(element)
