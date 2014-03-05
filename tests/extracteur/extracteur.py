@@ -2,14 +2,42 @@
 # Extracteur 
 
 """  
-Some explanations of this script :
+Some explanations about this script :
 
-1. output the file csv with 
-   cols = 'takenID','verifiedDate', 'serialNo', 'testID', 'Status', 'failLogLink'
+1. input : 1 list of MATs IDs (listTakenIDRecherche). Input is made at line 690.
 
-2. use of TimeStamp
+1. output : 2 CSV files showing the infos we need about those MATs. Output are made at lines 734 and 783 : 
+       - Mats.csv : columns = takenID, verifiedDate as timestamp, serialNo, testID, status, failLogLink (when there's one)
+       - Relative_TFLs.csv  : columns = takenID, date as timestamp, repeat Operations, remarks
 
-3. able to turn pages
+2. process ( in MAIN, starting line 684 ) :
+       1 - We log onto eQuality HomePage with an emulated selenium webbrowser
+       2 - We go to the MatsResult Page that matches our input list, using selenium API.
+       3 - We parse it and save what we need into Mats.csv.
+       4 - We go to the TFLResult Page that sums up the TFLs we found while parsing the MatsResult Page parsing.
+       5 - We parse it and save what we need into Relative_TFLs.csv.
+
+3. classes : We implemented 2 classes based on python HTMLParser, adapting it to the MatsResult pages and to the TFLResult pages :
+       - MatsParser ( line 60 ):
+           Methods : - initTemporaryResultsAndCounters ( self ) : resets current result and counters
+                     - feed ( self, html )                      : feeds one page
+                     - feedEveryPage ( self, browser )          : feeds all of the MatsResult pages
+                     - timeStamp ( self, matsTime )             : converts the Mats Verified Date into a timeStamp
+                     - handle_starttag ( self, tag, attrs )     : handles html starttag
+                     - handle_endtag ( self, tag )              : handles html endtag
+                     - handle_data ( self, data )               : handles data
+                     - endOfTr ( self )                         : appends current result to global result
+                     - getResultByTakenID ( self )              : gets global result
+       - TFLParser ( line 317 ):
+           Methods : - initTemporaryResultsAndCounters ( self ) : resets current result and counters
+                     - feed ( self, html )                      : feeds one page
+                     - feedEveryPage ( self, browser )          : feeds all of the MatsResult pages
+                     - timeStamp ( self, matsTime )             : converts the Mats Verified Date into a timeStamp
+                     - handle_starttag ( self, tag, attrs )     : handles html starttag
+                     - handle_endtag ( self, tag )              : handles html endtag
+                     - handle_data ( self, data )               : handles data
+                     - endOfTr ( self )                         : appends current result to global result
+                     - getResultByTakenID ( self )              : gets global result
 
 """
 
@@ -24,8 +52,13 @@ from selenium.webdriver.common.action_chains import ActionChains
 import time
 import os
 
-# Controller to parse MATS test_perform query result HTML page.
-class matsQueryResultHTMLParser(HTMLParser):
+
+"""""""""""""""""""""""""""      CLASSES      """""""""""""""""""""""""""
+
+
+""" MatsParser definition, to create a controller that will help us to parse a MatsResult Page """
+class MatsParser(HTMLParser):
+    
     def __init__(self, dbTakenID= [] ):
         HTMLParser.__init__(self)
 
@@ -62,52 +95,107 @@ class matsQueryResultHTMLParser(HTMLParser):
                     self.testIDCol, self.statusCol, self.failLogLinkCol]
 
         self.lengthResultCol = 35
-
-
-    def feed(self, html):
-        self.initTemporaryResultsAndCounters()
-        HTMLParser.feed(self, html)
-        # In order to check that a we have parsed new values (from a new page).
-        return self.pageRowStart
-
+    
     def initTemporaryResultsAndCounters(self):
-
-        self.result = ['']* 6 # Temporary result.
+        """ result is the temporary 'one row' result. It's appended to resultsByTakenID (which is the real result)
+        and then deleted in endOfTR, called at the end of each html table row """
+        self.result = ['']* 6 
         self.pagesNb = 0
         self.currentPageNo = 0
         self.pageRowStart = 0
         self.pageRowEnd = 0
         self.resultsNb = 0
 
-        self.tablei = 0 # Tables counter.
-        self.tdi = 0 # Cells counter.
-        self.bi = 0 # Bold text counter.
-        self.tri = 0 # Lines counter
+        """ counters """
+        self.tablei = 0 
+        self.tdi = 0 
+        self.bi = 0 
+        self.tri = 0 
+
+    """ feeds one html page """
+    def feed(self, html):
+        self.initTemporaryResultsAndCounters()
+        HTMLParser.feed(self, html)
+        # In order to check that we have parsed new values (from a new page).
+        return self.pageRowStart
+
+    """ if several, feeds all of the MatsResult pages """
+    def feedEveryPage(self, browser):
+        pageWebSource = browser.page_source.encode('utf8')
+        
+        # parser.feed return pageRowStart(type int)
+        rowStart = self.feed(pageWebSource) 
+
+        # Go to the next pages if any.
+        pageNbTotal = self.pagesNb
+        if pageNbTotal > 1:
+            newRowStart = rowStart # In order to check that we parse new results.
+            i = 2 # Page 1 is already parsed.
+            while i <= pageNbTotal:
+                while newRowStart == rowStart:
+                    link = browser.find_elements_by_link_text(str(i))
+                    link = link[0].find_elements_by_tag_name('font')[0]
+                    # link = browser.find_elements_by_link_text(str(i))                ]
+                    # if len(link) == 0:
+
+                    #     # Try to find a "More pages" link.
+                    #     # eQ displays page links by group of 10 only.
+
+                    #     #  .... code to write ...
+
+                    #     # link = browser.find_elements_by_link_text( \
+                    #     #     g_eq['linkTextMorePages'])[0]
+                    # else:
+                    #     link = link[0].find_elements_by_tag_name('font')[0]
+
+                    # Before any mouse action, re-focus on the window in case the
+                    # user has clicked away.
+                    browser.switch_to_active_element()
+                    link.click()
+                    # pstepii("Page {0}/{1}", i, t)
+                    newRowStart = self.feed(browser.page_source.encode('utf8'))
+                    # g_c.dec()
+                rowStart = newRowStart
+                i += 1
+
+    """turns the Mats Verified Date into a timestamp"""
+    def timeStamp (self, matsTime):
+
+        thisMatsDateTime = datetime.datetime.strptime(matsTime, \
+                                                     '%d-%b-%Y %I:%M %p')
+
+        #thisMatsDateTime = datetime.datetime.strptime(matsTime, \
+        #                                             '%d-%b-%Y\xc2\xa0%I:%M %p')
+        epoch = datetime.datetime.utcfromtimestamp(0)
+        delta = thisMatsDateTime - epoch
+        thisMatsTimeStamp = int(delta.total_seconds())
+        return str(thisMatsTimeStamp)
 
     def handle_starttag(self, tag, attrs):
-        # Detect tables (table).
+        """ tables counter is incremented at start tag """ 
         if tag == 'table':
             self.table = True
-            self.tablei += 1 # Tables counter.
+            self.tablei += 1 
             # if self.tablei == 3:
             #     g_c.inc()
-        # Detect table lines (tr) nested in table (table).
+        """ rows and cells counters will be at end tag """
         if tag == 'tr' and self.table:
             self.tr = True
-        # Detect table cells (td) nested in lines (tr).
+
         elif tag == 'td' and self.tr:
             self.td = True
-        # Detect bold text (b or strong) nested in cell (td).
+        
         elif (tag == 'b' or tag == 'strong') and self.td:
+            """bold tags also need to be counted, especially for the feedEveryPage method """
             self.b = True
-            self.bi += 1 # Bold text counter.
-        # Detect link (a) to TFL nested in cell (td).
-        # elif tag == 'a' and self.td and self.cols[self.tdi] == 'failLogLink':
+            self.bi += 1 
+            
         elif tag == 'a' and self.td and self.tdi == self.failLogLinkCol:
+            """ in case of link to a TFL in the row, adds 'true' at the right position of result """
             self.result[self.listCol.index(self.failLogLinkCol)] = str(True)
 
     def handle_endtag(self, tag):
-        # End of table line (tr).
+        
         if tag == 'table':
             self.table = False
             self.tr = False
@@ -115,8 +203,8 @@ class matsQueryResultHTMLParser(HTMLParser):
             self.b = False
 
             self.tri = 0
-            # if self.tablei == 3:
-            #     g_c.dec()
+
+            """ incrementation of rows and cells counters, as promised """
         elif tag == 'tr':
             self.tr = False
             self.td = False
@@ -126,36 +214,35 @@ class matsQueryResultHTMLParser(HTMLParser):
 
             self.endOfTr()
 
-            # Re-initialize cells counter and temporary result.
+            """ Re-initialization of cells counter and temporary result."""
             self.tdi = 0
             self.result = [''] * 6
-        # End of cell (td)
+        
         elif tag == 'td':
             self.td = False
             self.b = False
 
-            # If the cell was associated with TFL link, set the temporary
-            # result to False if it has not been set previously by the presence
-            # of a link in the cell.
+            """ in case of no link to a TFL in the row, adds 'false' at the right position of result """
             if ( self.tdi == self.failLogLinkCol
                 and self.result[self.listCol.index(self.failLogLinkCol)] != 'True'
                 ):
                 self.result[self.listCol.index(self.failLogLinkCol)] = str(False)
 
 
-            self.tdi += 1 # Cells counter.
-            self.bi = 0 # Re-initialize bold text counter.
+            self.tdi += 1 
+            self.bi = 0 
 
         elif tag == 'b' or tag == 'strong':
             self.b = False
 
     def handle_data(self, data):
-        # For table #1, get number of pages.
+        """ Table 1 contains infos about the current page and the total number
+        of pages to parse, valuable for the feedEveryPage method """
         if self.tablei == 1 and self.b:
             if self.bi == 3:
                 self.pagesNb = int(data)
                 if self.pagesNb == 1:
-                    self.bi += 1 # If only 1 page, no page links are displayed.
+                    self.bi += 1 # only 1 page => no page link (in which there would else be one bold balise) 
                     self.currentPageNo = 1
             elif self.bi == 4 and self.pagesNb > 1:
                 self.currentPageNo = int(data)
@@ -166,7 +253,7 @@ class matsQueryResultHTMLParser(HTMLParser):
             elif self.bi == 6:
                 self.pageRowEnd = int(data)
 
-        # For table #2, get total number of results.
+            """table 2 contains infos about the total number of rows to parse """
         elif self.tablei == 2 and self.b:
             self.resultsNb = int(data)
             # if self.currentPageNo == 1:
@@ -175,8 +262,9 @@ class matsQueryResultHTMLParser(HTMLParser):
             #     pstepi("Getting results #{0} to #{1}", self.pageRowStart,
             #            self.pageRowEnd)
 
-        # Record data for table #3 (actual list of tests taken).
+            """table 3 contains the actual datas that we want """
         elif self.tablei == 3 :
+            """ we check wether we are in one of the interesting columns. If we do, we store the datas in result"""
             if self.tdi < self.lengthResultCol and self.td and self.tdi in self.listCol:
                 indexCol = self.listCol.index(self.tdi)
                 if self.tdi != self.failLogLinkCol:   
@@ -185,14 +273,14 @@ class matsQueryResultHTMLParser(HTMLParser):
                     else:
                         self.result[indexCol] += ' ' + data.replace("\xc2\xa0", " ")
 
-                
+    """ called at the end of each html table row, endOfTr appends the current result to resultsByTakenID """            
     def endOfTr(self):
         # If we have found all cells (td), then transfer temporary result
         # into classified result.
         if self.tablei == 3 and self.tdi == self.lengthResultCol :            
             r = self.result
             # transform matsTime to matsTimeStamp
-            r[1] = matsTimeStamp(r[1])            
+            r[1] = self.timeStamp(r[1])            
                           
             # woID = getDictKey(r, 'woID', 'None')
             # serialNo = getDictKey(r, 'serialNo', 'None')
@@ -216,6 +304,7 @@ class matsQueryResultHTMLParser(HTMLParser):
             # # woID > serialNo > takenID > testData.
             # self.resultsByWoIDSerialNoTakenID[woID][serialNo][takenID] = r
 
+    """ gets the global result : the list of lists showing the datas we need """
     def getResultByTakenID(self):
         return self.resultsByTakenID
 
@@ -224,8 +313,9 @@ class matsQueryResultHTMLParser(HTMLParser):
 
 
 
-# Controller to parse TFL test_perform query result HTML page.
-class TFLQueryResultHTMLParser(HTMLParser):
+""" TFLParser definition, to create a controller that will help us to parse a MatsResult Page """
+class TFLParser(HTMLParser):
+    
     def __init__(self, dbTakenID= [] ):
         HTMLParser.__init__(self)
 
@@ -238,7 +328,6 @@ class TFLQueryResultHTMLParser(HTMLParser):
         self.resultsByTakenID = dbTakenID
         self.initTemporaryResultsAndCounters()
 
-        """modifs à faire éventuellement : """
         # self.cols = 'takenID', 'testID', 'testVersion', 'takenDate',\
         #     'site', 'tryNo', 'status', 'woID', 'po', 'line', 'testName',\
         #     'category', 'technician', 'wo', 'wc', 'operation', 'partNo',\
@@ -262,47 +351,103 @@ class TFLQueryResultHTMLParser(HTMLParser):
 
         self.lengthResultCol = 39
 
-
-    def feed(self, html):
-        self.initTemporaryResultsAndCounters()
-        HTMLParser.feed(self, html)
-        # In order to check that a we have parsed new values (from a new page).
-        return self.pageRowStart
-
     def initTemporaryResultsAndCounters(self):
-
-        self.result = ['']* 4 # Temporary result.
+        """ result is the temporary 'one row' result. It's appended to resultsByTakenID (which is the real result)
+        and then deleted in endOfTR, called at the end of each html table row """
+        self.result = ['']* 4 
         self.pagesNb = 0
         self.currentPageNo = 0
         self.pageRowStart = 0
         self.pageRowEnd = 0
         self.resultsNb = 0
 
-        self.tablei = 0 # Tables counter.
-        self.tdi = 0 # Cells counter.
-        self.bi = 0 # Bold text counter.
-        self.tri = 0 # Lines counter
+        """counters"""
+        self.tablei = 0
+        self.tdi = 0 
+        self.bi = 0 
+        self.tri = 0     
 
+    """ feeds one html page """
+    def feed(self, html):
+        self.initTemporaryResultsAndCounters()
+        HTMLParser.feed(self, html)
+        # In order to check that a we have parsed new values (from a new page).
+        return self.pageRowStart
+
+    """ if several, feeds all of the MatsResult pages """
+    def feedEveryPage(self, browser):
+
+        pageWebSource = browser.page_source.encode('utf8')
+
+        
+        # parser.feed return pageRowStart(type int)
+        rowStart = self.feed(pageWebSource) 
+
+        # Go to the next pages if any.
+        pageNbTotal = self.pagesNb
+        if pageNbTotal > 1:
+            newRowStart = rowStart # In order to check that we parse new results.
+            i = 2 # Page 1 is already parsed.
+            while i <= pageNbTotal:
+                while newRowStart == rowStart:
+                    link = browser.find_elements_by_link_text(str(i))
+                    link = link[0].find_elements_by_tag_name('font')[0]
+                    # link = browser.find_elements_by_link_text(str(i))                ]
+                    # if len(link) == 0:
+
+                    #     # Try to find a "More pages" link.
+                    #     # eQ displays page links by group of 10 only.
+
+                    #     #  .... code to write ...
+
+                    #     # link = browser.find_elements_by_link_text( \
+                    #     #     g_eq['linkTextMorePages'])[0]
+                    # else:
+                    #     link = link[0].find_elements_by_tag_name('font')[0]
+
+                    # Before any mouse action, re-focus on the window in case the
+                    # user has clicked away.
+                    browser.switch_to_active_element()
+                    link.click()
+                    # pstepii("Page {0}/{1}", i, t)
+                    newRowStart = self.feed(browser.page_source.encode('utf8'))
+                    # g_c.dec()
+                rowStart = newRowStart
+                i += 1
+                
+    """turns the TFL Date into a timestamp"""
+    def timeStamp (self, TFLDate):
+
+        thisTFLDate = datetime.datetime.strptime(TFLDate, \
+                                                     '%d-%b-%Y')
+
+        epoch = datetime.datetime.utcfromtimestamp(0)
+        delta = thisTFLDate - epoch
+        thisTFLTimeStamp = int(delta.total_seconds())
+        return str(thisTFLTimeStamp)
+    
     def handle_starttag(self, tag, attrs):
-        # Detect tables (table).
+        """ tables counter is incremented at start tag """ 
         if tag == 'table':
             self.table = True
-            self.tablei += 1 # Tables counter.
+            self.tablei += 1 
             # if self.tablei == 3:
             #     g_c.inc()
-        # Detect table lines (tr) nested in table (table).
+            
+            """ rows and cells counters will be at end tag """
         if tag == 'tr' and self.table:
             self.tr = True
-        # Detect table cells (td) nested in lines (tr).
+        
         elif tag == 'td' and self.tr:
             self.td = True
-        # Detect bold text (b or strong) nested in cell (td).
+            
+            """bold tags also need to be counted, especially for the feedEveryPage method """
         elif (tag == 'b' or tag == 'strong') and self.td:
             self.b = True
-            self.bi += 1 # Bold text counter.       
+            self.bi += 1        
 
     def handle_endtag(self, tag):
-        # End of table line (tr).
+        
         if tag == 'table':
             self.table = False
             self.tr = False
@@ -312,6 +457,8 @@ class TFLQueryResultHTMLParser(HTMLParser):
             self.tri = 0
             # if self.tablei == 3:
             #     g_c.dec()
+            
+            """ incrementation of rows and cells counters, as promised """
         elif tag == 'tr':
             self.tr = False
             self.td = False
@@ -321,27 +468,28 @@ class TFLQueryResultHTMLParser(HTMLParser):
 
             self.endOfTr()
 
-            # Re-initialize cells counter and temporary result.
+            """ Re-initialization of cells counter and temporary result."""
             self.tdi = 0
             self.result = [''] * 4
-        # End of cell (td)
+        
         elif tag == 'td':
             self.td = False
             self.b = False
 
-            self.tdi += 1 # Cells counter.
-            self.bi = 0 # Re-initialize bold text counter.
+            self.tdi += 1 
+            self.bi = 0 
 
         elif tag == 'b' or tag == 'strong':
             self.b = False
 
     def handle_data(self, data):
-        # For table #1, get number of pages.
+        """ Table 1 contains infos about the current page and the total number
+        of pages to parse, valuable for the feedEveryPage method """
         if self.tablei == 1 and self.b:
             if self.bi == 3:
                 self.pagesNb = int(data)
                 if self.pagesNb == 1:
-                    self.bi += 1 # If only 1 page, no page links are displayed.
+                    self.bi += 1 # only 1 page => no page link (in which there would else be one bold balise) 
                     self.currentPageNo = 1
             elif self.bi == 4 and self.pagesNb > 1:
                 self.currentPageNo = int(data)
@@ -352,7 +500,7 @@ class TFLQueryResultHTMLParser(HTMLParser):
             elif self.bi == 6:
                 self.pageRowEnd = int(data)
 
-        # For table #2, get total number of results.
+            """table 2 contains infos about the total number of rows to parse """
         elif self.tablei == 2 and self.b:
             self.resultsNb = int(data)
             # if self.currentPageNo == 1:
@@ -361,8 +509,9 @@ class TFLQueryResultHTMLParser(HTMLParser):
             #     pstepi("Getting results #{0} to #{1}", self.pageRowStart,
             #            self.pageRowEnd)
 
-        # Record data for table #3 (actual list of tests taken).
+            """table 3 contains the actual datas that we want """
         elif self.tablei == 3 :
+            """ we check wether we are in one of the interesting columns. If we do, we store the datas in result"""
             if self.tdi < self.lengthResultCol and self.td and self.tdi in self.listCol:
                 indexCol = self.listCol.index(self.tdi)
                 if self.result[indexCol] == '':
@@ -370,15 +519,14 @@ class TFLQueryResultHTMLParser(HTMLParser):
                 else:
                     self.result[indexCol] += ' ' + data.replace("\xc2\xa0", " ").replace("\n", " ")
                     
-
-                
+    """ called at the end of each html table row, endOfTr appends the current result to resultsByTakenID """                        
     def endOfTr(self):
         # If we have found all cells (td), then transfer temporary result
         # into classified result.
         if self.tablei == 3 and self.tdi == self.lengthResultCol :            
             r = self.result
             # transform matsTime to matsTimeStamp
-            r[1] = TFLTimeStamp(r[1])            
+            r[1] = self.timeStamp(r[1])            
                           
             # woID = getDictKey(r, 'woID', 'None')
             # serialNo = getDictKey(r, 'serialNo', 'None')
@@ -402,13 +550,14 @@ class TFLQueryResultHTMLParser(HTMLParser):
             # # woID > serialNo > takenID > testData.
             # self.resultsByWoIDSerialNoTakenID[woID][serialNo][takenID] = r
 
+    """ gets the global result : the list of lists showing the datas we need """
     def getResultByTakenID(self):
         return self.resultsByTakenID
 
     # def getResultByWoIDSerialNoTakenID(self):
     #     return self.resultsByWoIDSerialNoTakenID
 
-
+"""""""""""""""""""""""""""      CONVENIENCE FUNCTIONS     """""""""""""""""""""""""""
 
 
 # Get the value of the dict[key]. If the key is not defined yet, initialize
@@ -423,44 +572,16 @@ class TFLQueryResultHTMLParser(HTMLParser):
 #     if newKeyDict not in parentDict:
 #         parentDict[newKeyDict] = {}
 
+""" writes a list into a csv file in current directory """
 def listToCsv ( csvFileName, listName):
     with open(csvFileName, 'wb') as f:
         writer = csv.writer(f, delimiter=',')
         # writer.writerows(csvHead)
         writer.writerows(listName)
 
-def matsTimeStamp (matsTime):
 
-    # Problem with format of datetime "no-break space"
-    # So add \xc2\xa0
-    # But it causes another problem
-
-    thisMatsDateTime = datetime.datetime.strptime(matsTime, \
-                                                 '%d-%b-%Y %I:%M %p')
-
-    #thisMatsDateTime = datetime.datetime.strptime(matsTime, \
-    #                                             '%d-%b-%Y\xc2\xa0%I:%M %p')
-    epoch = datetime.datetime.utcfromtimestamp(0)
-    delta = thisMatsDateTime - epoch
-    thisMatsTimeStamp = int(delta.total_seconds())
-    return str(thisMatsTimeStamp)
-
-def TFLTimeStamp (TFLDate):
-
-    # Problem with format of datetime "no-break space"
-    # So add \xc2\xa0
-    # But it causes another problem
-
-    thisTFLDate = datetime.datetime.strptime(TFLDate, \
-                                                 '%d-%b-%Y')
-
-    #thisMatsDateTime = datetime.datetime.strptime(matsTime, \
-    #                                             '%d-%b-%Y\xc2\xa0%I:%M %p')
-    epoch = datetime.datetime.utcfromtimestamp(0)
-    delta = thisTFLDate - epoch
-    thisTFLTimeStamp = int(delta.total_seconds())
-    return str(thisTFLTimeStamp)
-
+""" generates a list of the takenIDs for which there has been a TFL
+    from the MatsParser.ResultByTakenID """
 def getTFLTakenID(listResult) :
     TFLTakenID = []
     for item in listResult :
@@ -468,85 +589,8 @@ def getTFLTakenID(listResult) :
             TFLTakenID.append(item[0])
     return TFLTakenID
 
-def matsReadPage():
 
-    pageWebSource = browser.page_source.encode('utf8')
 
-    
-    # parser.feed return pageRowStart(type int)
-    rowStart = MATsparser.feed(pageWebSource) 
-
-    # Go to the next pages if any.
-    pageNbTotal = MATsparser.pagesNb
-    if pageNbTotal > 1:
-        newRowStart = rowStart # In order to check that we parse new results.
-        i = 2 # Page 1 is already parsed.
-        while i <= pageNbTotal:
-            while newRowStart == rowStart:
-                link = browser.find_elements_by_link_text(str(i))
-                link = link[0].find_elements_by_tag_name('font')[0]
-                # link = browser.find_elements_by_link_text(str(i))                ]
-                # if len(link) == 0:
-
-                #     # Try to find a "More pages" link.
-                #     # eQ displays page links by group of 10 only.
-
-                #     #  .... code to write ...
-
-                #     # link = browser.find_elements_by_link_text( \
-                #     #     g_eq['linkTextMorePages'])[0]
-                # else:
-                #     link = link[0].find_elements_by_tag_name('font')[0]
-
-                # Before any mouse action, re-focus on the window in case the
-                # user has clicked away.
-                browser.switch_to_active_element()
-                link.click()
-                # pstepii("Page {0}/{1}", i, t)
-                newRowStart = MATsparser.feed(browser.page_source.encode('utf8'))
-                # g_c.dec()
-            rowStart = newRowStart
-            i += 1
-
-def TFLReadPage():
-
-    pageWebSource = browser.page_source.encode('utf8')
-
-    
-    # parser.feed return pageRowStart(type int)
-    rowStart = TFLparser.feed(pageWebSource) 
-
-    # Go to the next pages if any.
-    pageNbTotal = TFLparser.pagesNb
-    if pageNbTotal > 1:
-        newRowStart = rowStart # In order to check that we parse new results.
-        i = 2 # Page 1 is already parsed.
-        while i <= pageNbTotal:
-            while newRowStart == rowStart:
-                link = browser.find_elements_by_link_text(str(i))
-                link = link[0].find_elements_by_tag_name('font')[0]
-                # link = browser.find_elements_by_link_text(str(i))                ]
-                # if len(link) == 0:
-
-                #     # Try to find a "More pages" link.
-                #     # eQ displays page links by group of 10 only.
-
-                #     #  .... code to write ...
-
-                #     # link = browser.find_elements_by_link_text( \
-                #     #     g_eq['linkTextMorePages'])[0]
-                # else:
-                #     link = link[0].find_elements_by_tag_name('font')[0]
-
-                # Before any mouse action, re-focus on the window in case the
-                # user has clicked away.
-                browser.switch_to_active_element()
-                link.click()
-                # pstepii("Page {0}/{1}", i, t)
-                newRowStart = TFLparser.feed(browser.page_source.encode('utf8'))
-                # g_c.dec()
-            rowStart = newRowStart
-            i += 1
 
 
 
@@ -636,39 +680,47 @@ def TFLReadPage():
 # with open ('resultMats.htm', 'r') as source:
 #   pageWebSource = source.read()
 
-""" test on MATS """
 
-myUrl = "file:///" + os.path.dirname(os.path.abspath(__file__)) + "/home.htm"
+"""""""""""""""""""""""""""      MAIN     """""""""""""""""""""""""""
+
+
+""" the Mats part """
+
+""" loading the eQuality home page on a firefox browser """
+myUrl = "file:///" + os.path.dirname(os.path.abspath(__file__)) + "/home.htm"   # WRITE eQUALITY HOME PAGE URL HERE !
 browser = webdriver.Firefox()
 browser.get(myUrl)
 browser.implicitly_wait(5)
 
+""" finding the MatsQuery area"""
 area = browser.find_element_by_xpath("//area[contains(@alt, 'Query Performed Tests')]")
 
+""" clicking on it """
 test = ActionChains(browser)
 test.click(area)
 test.perform()
 
+""" exemple of a TakenID list to look for """
 listTakenIDRecherche = str([3401783, 3401784, 3401787, 3401790, 3401803]).replace(" ', '", ",")[2:-2]
 
-
+""" writing the list in the takenID input """
 browser.find_element_by_name('test_taken_id').send_keys(listTakenIDRecherche)
 
+""" finding the submit button """
 t = browser.find_element_by_name('sabutton')
+
+"""clicking on it """
 t.click()
 t.click() # Click twice in case the first click just re-focused the window.
 t.submit()
 
-MATsparser = matsQueryResultHTMLParser()
-
-matsReadPage()
-
-MATsListResultByTakenID = MATsparser.getResultByTakenID()
-
-TFLTakenID = str(getTFLTakenID(MATsListResultByTakenID)).replace(" ', '", ",")[2:-2] 
+""" getting the result list of the datas we need from this MatsQueryResult page """
+myMatsparser = MatsParser()
+myMatsparser.feedEveryPage(browser)
+myMatsListResultByTakenID = myMatsparser.getResultByTakenID()
 
 
-print MATsListResultByTakenID, TFLTakenID
+print myMatsListResultByTakenID, listTakenIDRecherche
 
 # stringResultByTakenID = json.dumps(dictResultByTakenID)
 # with open('resultMats_ByTakenID_v2.txt' , 'wb') as f1:
@@ -677,39 +729,47 @@ print MATsListResultByTakenID, TFLTakenID
     
 #writeHead doesn't work now!
 # csvHead = (['takenID'] + ['verifiedDate'] + ['serialNo'] + ['testID'] + ['Status'] + ['failLogLink'])
-listToCsv( 'Result_v3.csv', MATsListResultByTakenID )
+
+""" saving it into Mats.csv """
+listToCsv( 'Mats.csv', myMatsListResultByTakenID )
+
 
  
-""" test on TFL """
+""" the TFL part """
 
+""" going back to home page """
 browser.get(myUrl)
 
+""" finding the TFLQuery image """
 img = browser.find_element_by_xpath("//img[contains(@alt, 'Test Failed')]")
 
+""" clicking on it """
 test = ActionChains(browser)
 test.click(img)
 test.perform()
 
-listTakenIDRecherche = TFLTakenID
+""" getting the takenID list linked to the previous Mats """
+TFLTakenID = str(getTFLTakenID(myMatsListResultByTakenID)).replace(" ', '", ",")[2:-2] 
 
+""" writing the list into the takenID input """
+browser.find_element_by_name('test_taken_id').send_keys(TFLTakenID)
 
-browser.find_element_by_name('test_taken_id').send_keys(listTakenIDRecherche)
-time.sleep(10)
-
+""" finding the submit button """
 t = browser.find_element_by_name('sabutton')
+
+""" clicking on it """
 t.click()
 t.click() # Click twice in case the first click just re-focused the window.
 t.submit()
 
-TFLparser = TFLQueryResultHTMLParser()
-
-TFLReadPage()
-
-TFLListResultByTakenID = TFLparser.getResultByTakenID()
-
+""" getting the result list of the datas we need from this MatsQueryResult page """
+myTFLparser = TFLParser()
+myTFLparser.feedEveryPage(browser)
+myTFLListResultByTakenID = myTFLparser.getResultByTakenID()
 
 
-print TFLListResultByTakenID, TFLTakenID, listTakenIDRecherche
+
+print myTFLListResultByTakenID, TFLTakenID
 
 # stringResultByTakenID = json.dumps(dictResultByTakenID)
 # with open('resultMats_ByTakenID_v2.txt' , 'wb') as f1:
@@ -718,7 +778,9 @@ print TFLListResultByTakenID, TFLTakenID, listTakenIDRecherche
     
 #writeHead doesn't work now!
 # csvHead = (['takenID'] + ['verifiedDate'] + ['serialNo'] + ['testID'] + ['Status'] + ['failLogLink'])
-listToCsv( 'Result_v4.csv', TFLListResultByTakenID )
+
+""" saving it into Mats.csv """
+listToCsv( 'Relative_TFLs.csv', myTFLListResultByTakenID )
 
 
 
