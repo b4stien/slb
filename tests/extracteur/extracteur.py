@@ -8,10 +8,9 @@ Some explanations of this script :
 
 2. use of TimeStamp
 
-<<<<<<< HEAD
+
 3. able to turn pages
-=======
->>>>>>> 63da09f517b022f64d21030e04851ba1f3acb82e
+
 
 """
 
@@ -265,7 +264,7 @@ def matsTimeStamp (matsTime):
     thisMatsTimeStamp = int(delta.total_seconds())
     return str(thisMatsTimeStamp)
 
-def matsReadPage(myUrl):
+def matsReadPage():
 
     pageWebSource = browser.page_source.encode('utf8')
 
@@ -304,7 +303,6 @@ def matsReadPage(myUrl):
                 # g_c.dec()
             rowStart = newRowStart
             i += 1
-
 
 
 # def switchToFrameMainMenu():
@@ -395,64 +393,35 @@ def matsReadPage(myUrl):
 
 myUrl = "file:///" + os.path.dirname(os.path.abspath(__file__)) + "/home.htm"
 browser = webdriver.Firefox()
+browser.implicitly_wait(5)
 browser.get(myUrl)
 
-<<<<<<< HEAD
 area = browser.find_element_by_xpath("//area[contains(@alt, 'Query Performed Tests')]")
 
-test = ActionChains(browser)
-=======
-"""loads the home page"""
-firefox = webdriver.Firefox()
-firefox.implicitly_wait(5)
-firefox.get(myUrl)
-
-"""finds the MatsQueryResult area"""
-area = firefox.find_element_by_xpath("//area[contains(@alt, 'Query Performed Tests')]")
-
 """clicks on it"""
-test = ActionChains(firefox)
->>>>>>> 63da09f517b022f64d21030e04851ba1f3acb82e
+test = ActionChains(browser)
 test.click(area)
 test.perform()
 
 listTakenIDRecherche = [3401783, 3401784, 3401787, 3401790, 3401803]
 
-<<<<<<< HEAD
-
+"""finds the test_taken_id input and writes the list that we are looking for"""
 browser.find_element_by_name('test_taken_id').send_keys(listTakenIDRecherche)
 
-t = browser.find_element_by_name('sabutton')
-=======
-"""finds the test_taken_id input and writes the list that we are looking for"""
-firefox.find_element_by_name('test_taken_id').send_keys(listTakenIDRecherche)
-
 """finds the submit button"""
-t = firefox.find_element_by_name('sabutton')
+t = browser.find_element_by_name('sabutton')
 """clicks on it"""
->>>>>>> 63da09f517b022f64d21030e04851ba1f3acb82e
 t.click()
 t.click() # Click twice in case the first click just re-focused the window.
 t.submit()
 
-<<<<<<< HEAD
-browser.implicitly_wait(5)
-
-parser = matsQueryResultHTMLParser()
-
-matsReadPage(myUrl)
-
-=======
-
-"""re-encodes in utf-8"""
-pageWebSource = firefox.page_source.encode('utf8')
-
-
 parser = matsHTMLParser()
 """feeds this page to parser"""
-nnn = parser.feed(pageWebSource)
+
+matsReadPage()
+
 """gets global result"""
->>>>>>> 63da09f517b022f64d21030e04851ba1f3acb82e
+
 listResultByTakenID = parser.getResultByTakenID()
 
 print listResultByTakenID
