@@ -8,9 +8,7 @@ Some explanations of this script :
 
 2. use of TimeStamp
 
-
 3. able to turn pages
-
 
 """
 
@@ -25,13 +23,11 @@ from selenium.webdriver.common.action_chains import ActionChains
 import time
 import os
 
-""" Controller to parse MATS, inherits the HTMLParser Python class. """
-
-class matsHTMLParser(HTMLParser):
+# Controller to parse MATS test_perform query result HTML page.
+class matsQueryResultHTMLParser(HTMLParser):
     def __init__(self, dbTakenID= [] ):
         HTMLParser.__init__(self)
-        
-        """ localization attributes """
+
         self.table = False
         self.tr = False
         self.td = False
@@ -39,7 +35,7 @@ class matsHTMLParser(HTMLParser):
         self.a = False
 
         self.resultsByTakenID = dbTakenID
-        self.init()
+        self.initTemporaryResultsAndCounters()
 
         # self.cols = 'takenID', 'testID', 'testVersion', 'takenDate',\
         #     'site', 'tryNo', 'status', 'woID', 'po', 'line', 'testName',\
@@ -54,7 +50,6 @@ class matsHTMLParser(HTMLParser):
         # In order to note the places of part, serialNo, testId, failLogLink 
         # in the table of webpage
 
-        """identification of the interesting columns, change here in case of change in eQuality. """
         self.takenIDCol = 0
         self.modifiedDateCol = 29
         self.serialNoCol = 24
@@ -64,57 +59,54 @@ class matsHTMLParser(HTMLParser):
 
         self.listCol = [ self.takenIDCol, self.modifiedDateCol, self.serialNoCol, \
                     self.testIDCol, self.statusCol, self.failLogLinkCol]
-        
-        """total number of columns in the MATS page"""
+
         self.lengthResultCol = 35
 
-        """buffer some html data into the MatsHTMLParser"""
+
     def feed(self, html):
-        self.init()
+        self.initTemporaryResultsAndCounters()
         HTMLParser.feed(self, html)
+        # In order to check that a we have parsed new values (from a new page).
+        return self.pageRowStart
 
-    """ reset counters and result """
-    def init(self):
+    def initTemporaryResultsAndCounters(self):
 
-        """ temporary row result, to be appended to the global result at the end of the line """
-        self.result = ['']* 6
-        
+        self.result = ['']* 6 # Temporary result.
         self.pagesNb = 0
         self.currentPageNo = 0
         self.pageRowStart = 0
         self.pageRowEnd = 0
         self.resultsNb = 0
 
-        """counters"""
-        self.tablei = 0 
-        self.tdi = 0 
-        self.bi = 0 
-        self.tri = 0 
+        self.tablei = 0 # Tables counter.
+        self.tdi = 0 # Cells counter.
+        self.bi = 0 # Bold text counter.
+        self.tri = 0 # Lines counter
 
     def handle_starttag(self, tag, attrs):
-        """incrementing tables counter at start tag"""
+        # Detect tables (table).
         if tag == 'table':
             self.table = True
-            self.tablei += 1 
+            self.tablei += 1 # Tables counter.
             # if self.tablei == 3:
             #     g_c.inc()
-        """rows and cells counters will be incremented at end tag"""
+        # Detect table lines (tr) nested in table (table).
         if tag == 'tr' and self.table:
             self.tr = True
+        # Detect table cells (td) nested in lines (tr).
         elif tag == 'td' and self.tr:
             self.td = True
-
+        # Detect bold text (b or strong) nested in cell (td).
         elif (tag == 'b' or tag == 'strong') and self.td:
             self.b = True
-            self.bi += 1
-
-            """ adding 'true' at the last position of the current row result in case of link to a TFL in the row"""
+            self.bi += 1 # Bold text counter.
+        # Detect link (a) to TFL nested in cell (td).
+        # elif tag == 'a' and self.td and self.cols[self.tdi] == 'failLogLink':
         elif tag == 'a' and self.td and self.tdi == self.failLogLinkCol:
             self.result[self.listCol.index(self.failLogLinkCol)] = str(True)
-            
 
     def handle_endtag(self, tag):
-        
+        # End of table line (tr).
         if tag == 'table':
             self.table = False
             self.tr = False
@@ -124,61 +116,56 @@ class matsHTMLParser(HTMLParser):
             self.tri = 0
             # if self.tablei == 3:
             #     g_c.dec()
-            
-            """incrementation of rows and cells counters here"""    
         elif tag == 'tr':
             self.tr = False
             self.td = False
             self.b = False
 
             self.tri += 1
-            """call on endOfTr to let it add the current row result to the global result"""
+
             self.endOfTr()
 
-            
+            # Re-initialize cells counter and temporary result.
             self.tdi = 0
             self.result = [''] * 6
-        
+        # End of cell (td)
         elif tag == 'td':
             self.td = False
             self.b = False
 
-            """add 'false' at the last position of the current row result in case of no link to a TFL in the row"""
+            # If the cell was associated with TFL link, set the temporary
+            # result to False if it has not been set previously by the presence
+            # of a link in the cell.
             if ( self.tdi == self.failLogLinkCol
                 and self.result[self.listCol.index(self.failLogLinkCol)] != 'True'
                 ):
                 self.result[self.listCol.index(self.failLogLinkCol)] = str(False)
 
 
-            self.tdi += 1 
-            self.bi = 0 
+            self.tdi += 1 # Cells counter.
+            self.bi = 0 # Re-initialize bold text counter.
 
         elif tag == 'b' or tag == 'strong':
             self.b = False
 
     def handle_data(self, data):
-
-        """table 1 countains some valuable infos ... """
+        # For table #1, get number of pages.
         if self.tablei == 1 and self.b:
-            """ ... total number of pages in the third bold balise"""
             if self.bi == 3:
                 self.pagesNb = int(data)
                 if self.pagesNb == 1:
-                    self.bi += 1 # If only one page, no page links (which else countains one bold balise) are displayed.
+                    self.bi += 1 # If only 1 page, no page links are displayed.
                     self.currentPageNo = 1
             elif self.bi == 4 and self.pagesNb > 1:
-                """ ... current page number in the fourth one"""
                 self.currentPageNo = int(data)
                 # if self.currentPageNo == 1:
                 #     pstepi("Found {0} page(s).", self.pagesNb)
             elif self.bi == 5:
-                """ ... pageRowStart in the fifth one"""
                 self.pageRowStart = int(data.lstrip('Rows '))
             elif self.bi == 6:
-                """ ... pageRowEnd in the sixth one"""
                 self.pageRowEnd = int(data)
 
-            """table 2 countains the number of results"""
+        # For table #2, get total number of results.
         elif self.tablei == 2 and self.b:
             self.resultsNb = int(data)
             # if self.currentPageNo == 1:
@@ -187,22 +174,23 @@ class matsHTMLParser(HTMLParser):
             #     pstepi("Getting results #{0} to #{1}", self.pageRowStart,
             #            self.pageRowEnd)
 
-            """table 3 countains the actual datas to get"""
+        # Record data for table #3 (actual list of tests taken).
         elif self.tablei == 3 :
-            if  self.td and self.tdi in self.listCol:
+            if self.tdi < self.lengthResultCol and self.td and self.tdi in self.listCol:
                 indexCol = self.listCol.index(self.tdi)
-                if self.tdi != self.failLogLinkCol:
-                    """if the column is among the interesting ones except for the TFL one, write the data at the right position of the current row result, replacing insecable spaces by usual spaces"""
+                if self.tdi != self.failLogLinkCol:   
                     if self.result[indexCol] == '':
                         self.result[indexCol] = data.replace("\xc2\xa0", " ")
                     else:
                         self.result[indexCol] += ' ' + data.replace("\xc2\xa0", " ")
 
-    """appends current row result to global result and converts the MATS date into a timestamp"""            
+                
     def endOfTr(self):
+        # If we have found all cells (td), then transfer temporary result
+        # into classified result.
         if self.tablei == 3 and self.tdi == self.lengthResultCol :            
             r = self.result
-            """turn matsTime into matsTimeStamp"""
+            # transform matsTime to matsTimeStamp
             r[1] = matsTimeStamp(r[1])            
                           
             # woID = getDictKey(r, 'woID', 'None')
@@ -227,7 +215,6 @@ class matsHTMLParser(HTMLParser):
             # # woID > serialNo > takenID > testData.
             # self.resultsByWoIDSerialNoTakenID[woID][serialNo][takenID] = r
 
-    """gets global result"""
     def getResultByTakenID(self):
         return self.resultsByTakenID
 
@@ -246,8 +233,6 @@ class matsHTMLParser(HTMLParser):
 #     if newKeyDict not in parentDict:
 #         parentDict[newKeyDict] = {}
 
-""" 2 convenience - functions"""
-
 def listToCsv ( csvFileName, listName):
     with open(csvFileName, 'wb') as f:
         writer = csv.writer(f, delimiter=',')
@@ -256,9 +241,15 @@ def listToCsv ( csvFileName, listName):
 
 def matsTimeStamp (matsTime):
 
+    # Problem with format of datetime "no-break space"
+    # So add \xc2\xa0
+    # But it causes another problem
+
     thisMatsDateTime = datetime.datetime.strptime(matsTime, \
                                                  '%d-%b-%Y %I:%M %p')
 
+    #thisMatsDateTime = datetime.datetime.strptime(matsTime, \
+    #                                             '%d-%b-%Y\xc2\xa0%I:%M %p')
     epoch = datetime.datetime.utcfromtimestamp(0)
     delta = thisMatsDateTime - epoch
     thisMatsTimeStamp = int(delta.total_seconds())
@@ -303,6 +294,7 @@ def matsReadPage():
                 # g_c.dec()
             rowStart = newRowStart
             i += 1
+
 
 
 # def switchToFrameMainMenu():
@@ -393,34 +385,29 @@ def matsReadPage():
 
 myUrl = "file:///" + os.path.dirname(os.path.abspath(__file__)) + "/home.htm"
 browser = webdriver.Firefox()
-browser.implicitly_wait(5)
 browser.get(myUrl)
 
 area = browser.find_element_by_xpath("//area[contains(@alt, 'Query Performed Tests')]")
 
-"""clicks on it"""
 test = ActionChains(browser)
 test.click(area)
 test.perform()
 
 listTakenIDRecherche = [3401783, 3401784, 3401787, 3401790, 3401803]
 
-"""finds the test_taken_id input and writes the list that we are looking for"""
+
 browser.find_element_by_name('test_taken_id').send_keys(listTakenIDRecherche)
 
-"""finds the submit button"""
 t = browser.find_element_by_name('sabutton')
-"""clicks on it"""
 t.click()
 t.click() # Click twice in case the first click just re-focused the window.
 t.submit()
 
-parser = matsHTMLParser()
-"""feeds this page to parser"""
+browser.implicitly_wait(5)
+
+parser = matsQueryResultHTMLParser()
 
 matsReadPage()
-
-"""gets global result"""
 
 listResultByTakenID = parser.getResultByTakenID()
 
