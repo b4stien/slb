@@ -255,6 +255,13 @@ def matsTimeStamp (matsTime):
     thisMatsTimeStamp = int(delta.total_seconds())
     return str(thisMatsTimeStamp)
 
+def getTFLTakenID(listResult) :
+    TFLTakenID = []
+    for item in listResult :
+        if item[5] == "True" :
+            TFLTakenID.append(item[0])
+    return TFLTakenID
+
 def matsReadPage():
 
     pageWebSource = browser.page_source.encode('utf8')
@@ -386,6 +393,7 @@ def matsReadPage():
 myUrl = "file:///" + os.path.dirname(os.path.abspath(__file__)) + "/home.htm"
 browser = webdriver.Firefox()
 browser.get(myUrl)
+browser.implicitly_wait(5)
 
 area = browser.find_element_by_xpath("//area[contains(@alt, 'Query Performed Tests')]")
 
@@ -403,21 +411,22 @@ t.click()
 t.click() # Click twice in case the first click just re-focused the window.
 t.submit()
 
-browser.implicitly_wait(5)
-
 parser = matsQueryResultHTMLParser()
 
 matsReadPage()
 
 listResultByTakenID = parser.getResultByTakenID()
 
-print listResultByTakenID
+TFLTakenID = getTFLTakenID(listResultByTakenID)
+
+print listResultByTakenID, TFLTakenID
 
 # stringResultByTakenID = json.dumps(dictResultByTakenID)
 # with open('resultMats_ByTakenID_v2.txt' , 'wb') as f1:
 #   f1.write(stringResultByTakenID
 
 
+    
 #writeHead doesn't work now!
 # csvHead = (['takenID'] + ['verifiedDate'] + ['serialNo'] + ['testID'] + ['Status'] + ['failLogLink'])
 listToCsv( 'Result_v3.csv', listResultByTakenID )
