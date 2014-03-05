@@ -8,7 +8,7 @@ Some explanations of this script :
 
 2. use of TimeStamp
 
-3. #Problem with format of datetime "no-break space" ,it causes another problem
+3. able to turn pages
 
 """
 
@@ -255,6 +255,47 @@ def matsTimeStamp (matsTime):
     thisMatsTimeStamp = int(delta.total_seconds())
     return str(thisMatsTimeStamp)
 
+def matsReadPage(myUrl):
+
+    pageWebSource = browser.page_source.encode('utf8')
+
+    
+    # parser.feed return pageRowStart(type int)
+    rowStart = parser.feed(pageWebSource) 
+
+    # Go to the next pages if any.
+    pageNbTotal = parser.pagesNb
+    if pageNbTotal > 1:
+        newRowStart = rowStart # In order to check that we parse new results.
+        i = 2 # Page 1 is already parsed.
+        while i <= pageNbTotal:
+            while newRowStart == rowStart:
+                link = browser.find_elements_by_link_text(str(i))
+                link = link[0].find_elements_by_tag_name('font')[0]
+                # link = browser.find_elements_by_link_text(str(i))                ]
+                # if len(link) == 0:
+
+                #     # Try to find a "More pages" link.
+                #     # eQ displays page links by group of 10 only.
+
+                #     #  .... code to write ...
+
+                #     # link = browser.find_elements_by_link_text( \
+                #     #     g_eq['linkTextMorePages'])[0]
+                # else:
+                #     link = link[0].find_elements_by_tag_name('font')[0]
+
+                # Before any mouse action, re-focus on the window in case the
+                # user has clicked away.
+                browser.switch_to_active_element()
+                link.click()
+                # pstepii("Page {0}/{1}", i, t)
+                newRowStart = parser.feed(browser.page_source.encode('utf8'))
+                # g_c.dec()
+            rowStart = newRowStart
+            i += 1
+
+
 
 # def switchToFrameMainMenu():
 #        # Loop to access SLB Domain.
@@ -340,39 +381,33 @@ def matsTimeStamp (matsTime):
 ########## Test with resultMats.htm #######################################
 
 # with open ('resultMats.htm', 'r') as source:
-# 	pageWebSource = source.read()
+#   pageWebSource = source.read()
 
 myUrl = "file:///" + os.path.dirname(os.path.abspath(__file__)) + "/home.htm"
+browser = webdriver.Firefox()
+browser.get(myUrl)
 
-firefox = webdriver.Firefox()
-firefox.implicitly_wait(5)
-firefox.get(myUrl)
+area = browser.find_element_by_xpath("//area[contains(@alt, 'Query Performed Tests')]")
 
-
-area = firefox.find_element_by_xpath("//area[contains(@alt, 'Query Performed Tests')]")
-
-test = ActionChains(firefox)
+test = ActionChains(browser)
 test.click(area)
 test.perform()
 
 listTakenIDRecherche = [3401783, 3401784, 3401787, 3401790, 3401803]
 
 
-firefox.find_element_by_name('test_taken_id').send_keys(listTakenIDRecherche)
+browser.find_element_by_name('test_taken_id').send_keys(listTakenIDRecherche)
 
-t = firefox.find_element_by_name('sabutton')
+t = browser.find_element_by_name('sabutton')
 t.click()
 t.click() # Click twice in case the first click just re-focused the window.
-    
 t.submit()
 
-
-
-pageWebSource = firefox.page_source.encode('utf8')
-
+browser.implicitly_wait(5)
 
 parser = matsQueryResultHTMLParser()
-nnn = parser.feed(pageWebSource)
+
+matsReadPage(myUrl)
 
 listResultByTakenID = parser.getResultByTakenID()
 
@@ -380,7 +415,7 @@ print listResultByTakenID
 
 # stringResultByTakenID = json.dumps(dictResultByTakenID)
 # with open('resultMats_ByTakenID_v2.txt' , 'wb') as f1:
-# 	f1.write(stringResultByTakenID
+#   f1.write(stringResultByTakenID
 
 
 #writeHead doesn't work now!
