@@ -8,7 +8,7 @@ Some explanations about this script :
 
 1. output : 2 CSV files showing the infos we need about those MATs. Output are made at lines 734 and 783 : 
        - Mats.csv : columns = takenID, verifiedDate as timestamp, serialNo, testID, status, failLogLink (when there's one)
-       - Relative_TFLs.csv  : columns = takenID, date as timestamp, repeat Operations, remarks
+       - Relative_TFLs.csv  : columns = takenID, testID, serialNo, date as timestamp, remarks, repeat Operations
 
 2. process ( in MAIN, starting line 684 ) :
        1 - We log onto eQuality HomePage with an emulated selenium webbrowser
@@ -339,19 +339,20 @@ class TFLParser(HTMLParser):
         # in the table of webpage
 
         self.takenIDCol = 0
-        self.DateCol = 3
-        self.RepeatOperationsCol = 21
+        self.testIDCol = 1
+        self.DateCol = 3        
         self.RemarksCol = 17
+        self.RepeatOperationsCol = 21
+        self.serialNumberCol = 29
 
-        self.listCol = [ self.takenIDCol, self.DateCol, self.RepeatOperationsCol, \
-                    self.RemarksCol]
+        self.listCol = [ self.takenIDCol, self.testIDCol, self.serialNumberCol, self.DateCol, self.RemarksCol, self.RepeatOperationsCol]
 
         self.lengthResultCol = 39
 
     def initTemporaryResultsAndCounters(self):
         """ result is the temporary 'one row' result. It's appended to resultsByTakenID (which is the real result)
         and then deleted in endOfTR, called at the end of each html table row """
-        self.result = ['']* 4 
+        self.result = ['']* 6 
         self.pagesNb = 0
         self.currentPageNo = 0
         self.pageRowStart = 0
@@ -368,7 +369,7 @@ class TFLParser(HTMLParser):
     def feed(self, html):
         self.initTemporaryResultsAndCounters()
         HTMLParser.feed(self, html)
-        # In order to check that a we have parsed new values (from a new page).
+        # In order to check that we have parsed new values (from a new page).
         return self.pageRowStart
 
     """ if several, feeds all of the MatsResult pages """
@@ -466,7 +467,7 @@ class TFLParser(HTMLParser):
 
             """ Re-initialization of cells counter and temporary result."""
             self.tdi = 0
-            self.result = [''] * 4
+            self.result = [''] * 6
         
         elif tag == 'td':
             self.td = False
@@ -522,7 +523,7 @@ class TFLParser(HTMLParser):
         if self.tablei == 3 and self.tdi == self.lengthResultCol :            
             r = self.result
             # transform matsTime to matsTimeStamp
-            r[1] = self.timeStamp(r[1])            
+            r[3] = self.timeStamp(r[3])            
                           
             # woID = getDictKey(r, 'woID', 'None')
             # serialNo = getDictKey(r, 'serialNo', 'None')
@@ -672,8 +673,8 @@ def focusDefaultContent(myDriver):
 waitLogin = 15
 
 """ loading the eQuality home page on a firefox browser """
-#myUrl = "file:///" + os.path.dirname(os.path.abspath(__file__)) + "/home.htm"   # WRITE eQUALITY HOME PAGE URL HERE !
-myUrl = "http://www.equality-eur.slb.com"
+myUrl = "file:///" + os.path.dirname(os.path.abspath(__file__)) + "/home.htm"   # WRITE eQUALITY HOME PAGE URL HERE !
+#myUrl = "http://www.equality-eur.slb.com"
 browser = webdriver.Firefox()
 browser.get(myUrl)
 browser.implicitly_wait(5)
