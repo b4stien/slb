@@ -1,0 +1,3 @@
+1) les input des searchPages ne dépassent pas 255 caractères. Vérifier que c'est moins, et si non le faire en plusieurs fois.
+
+2) pouvoir sélectionner les mats par Serial N° / Dates / combinaison de département et date.
