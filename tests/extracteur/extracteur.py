@@ -121,11 +121,9 @@ class MatsParser(HTMLParser):
 
     """ if several, feeds all of the MatsResult pages """
     def feedEveryPage(self, browser):
-        pageWebSource = browser.page_source.encode('utf8')
-        
+        pageWebSource = browser.page_source.encode('utf8')        
         # parser.feed return pageRowStart(type int)
         rowStart = self.feed(pageWebSource) 
-
         # Go to the next pages if any.
         pageNbTotal = self.pagesNb
         if pageNbTotal > 1:
@@ -133,20 +131,19 @@ class MatsParser(HTMLParser):
             i = 2 # Page 1 is already parsed.
             while i <= pageNbTotal:
                 while newRowStart == rowStart:
-                    link = browser.find_elements_by_link_text(str(i))
-                    link = link[0].find_elements_by_tag_name('font')[0]
-                    # link = browser.find_elements_by_link_text(str(i))                ]
-                    # if len(link) == 0:
+                    #link = browser.find_elements_by_link_text(str(i))
+                    #link = link[0].find_elements_by_tag_name('font')[0]
+                    link = browser.find_elements_by_link_text(str(i))                
+                    if len(link) == 0:
 
-                    #     # Try to find a "More pages" link.
-                    #     # eQ displays page links by group of 10 only.
+                        # Try to find a "More pages" link.
+                        # eQ displays page links by group of 10 only.
 
-                    #     #  .... code to write ...
+                        #  .... code to write ...
 
-                    #     # link = browser.find_elements_by_link_text( \
-                    #     #     g_eq['linkTextMorePages'])[0]
-                    # else:
-                    #     link = link[0].find_elements_by_tag_name('font')[0]
+                        link = browser.find_elements_by_link_text("More->>")[0]
+                    else:
+                        link = link[0].find_elements_by_tag_name('font')[0]
 
                     # Before any mouse action, re-focus on the window in case the
                     # user has clicked away.
@@ -390,20 +387,19 @@ class TFLParser(HTMLParser):
             i = 2 # Page 1 is already parsed.
             while i <= pageNbTotal:
                 while newRowStart == rowStart:
-                    link = browser.find_elements_by_link_text(str(i))
-                    link = link[0].find_elements_by_tag_name('font')[0]
-                    # link = browser.find_elements_by_link_text(str(i))                ]
-                    # if len(link) == 0:
+                    #link = browser.find_elements_by_link_text(str(i))
+                    #link = link[0].find_elements_by_tag_name('font')[0]
+                    link = browser.find_elements_by_link_text(str(i)) 
+                    if len(link) == 0:
 
-                    #     # Try to find a "More pages" link.
-                    #     # eQ displays page links by group of 10 only.
+                        # Try to find a "More pages" link.
+                        # eQ displays page links by group of 10 only.
 
-                    #     #  .... code to write ...
+                        #  .... code to write ...
 
-                    #     # link = browser.find_elements_by_link_text( \
-                    #     #     g_eq['linkTextMorePages'])[0]
-                    # else:
-                    #     link = link[0].find_elements_by_tag_name('font')[0]
+                        link = browser.find_elements_by_link_text("More->>")[0]
+                    else:
+                        link = link[0].find_elements_by_tag_name('font')[0]
 
                     # Before any mouse action, re-focus on the window in case the
                     # user has clicked away.
@@ -594,27 +590,31 @@ def getTFLTakenID(listResult) :
 
 
 
-# def switchToFrameMainMenu():
-#        # Loop to access SLB Domain.
-#         # If not in SLB Domain, eQ prompts a basic HTTP authentication (modal
-#         # dialog) that cannot be handled by Selenium. The user must enter his
-#         # LDAP credentials.
-#         machineInSlbDomain = False
-#         while not machineInSlbDomain:
-#             try:
-#                 myDriver.focusDefaultContent()
-#                 #myDriver.switch_to_default_content()
-#                 t = myDriver.find_element_by_name("main_menu")
-#                 myDriver.switch_to_frame(t)
-#                 machineInSlbDomain = True
-#             # except:
-#             #     p_("Cannot access the frame.")
-#             #     p_("eQuality may be prompting for login.")
-#             #     p_("Refreshing the page to reload the login prompt.")
-#             #     myDriver.get(g_eq['url'])
-#             #     p_("Please login within the next {0} second(s).",
-#             #        g_param['waitLogin'])
-#             #     time.sleep(g_param['waitLogin'])
+def switchToFrameMainMenu(myDriver):
+    #Loop to access SLB Domain.
+    #If not in SLB Domain, eQ prompts a basic HTTP authentication (modal
+    #dialog) that cannot be handled by Selenium. The user must enter his
+    #LDAP credentials.
+    machineInSlbDomain = False
+    while not machineInSlbDomain:
+        try:
+            #time.sleep(3)
+            focusDefaultContent(myDriver)
+            #myDriver.switch_to_default_content()            
+            #t = myDriver.find_element_by_x_path("//frame[contains(@name, 'main_menu')]")
+            print "found element"
+            myDriver.switch_to_frame(myDriver.find_element_by_name("main_menu"))
+            print "switched"
+            machineInSlbDomain = True
+            
+        except:
+            #p_("Cannot access the frame.")
+            #p_("eQuality may be prompting for login.")
+            #p_("Refreshing the page to reload the login prompt.")
+            myDriver.get(myUrl)
+            #p_("Please login within the next {0} second(s).",
+            #g_param[waitLogin)
+            time.sleep(waitLogin)
 
 
 # def goToMatsPerformQuery():
@@ -649,30 +649,13 @@ def getTFLTakenID(listResult) :
 #             goToHome()
 #             return goToMatsPerformQuery()
 
-# def goToHome():
-#     myDriver.switchToFrameToolbar()
-#     imgs = myDriver.find_elements_by_tag_name('img')
-#     for img in imgs:
-#         if (img.get_attribute('src').find(g_eq['imageLinkHome'])\
-#             >= 0
-#             ):
-#             myDriver.focusActiveElement()
-#             img.click()
-#                 # Give some time for the click to take effect.
-#             time.sleep(g_param['waitMainMenu'])
-#             myDriver.switchToFrameMainMenu()
-#             return
-# def switchToFrameToolbar():
-#     myDriver.focusDefaultContent()
-#     t = myDriver.find_element_by_name(g_eq['frameToolbar'])
-#     myDriver.switch_to_frame(t)
 
-#     # Re-focus on the window before any mouse action.
-# def focusActiveElement():
-#     myDriver.switch_to_active_element()
+# Re-focus on the window before any mouse action.
+def focusActiveElement(myDriver):
+    myDriver.switch_to_active_element()
 
-# def focusDefaultContent():
-#     myDriver.switch_to_default_content()
+def focusDefaultContent(myDriver):
+    myDriver.switch_to_default_content()
 
 
 ########## Test with resultMats.htm #######################################
@@ -686,16 +669,22 @@ def getTFLTakenID(listResult) :
 
 """ the Mats part """
 
+waitLogin = 15
+
 """ loading the eQuality home page on a firefox browser """
-myUrl = "file:///" + os.path.dirname(os.path.abspath(__file__)) + "/home.htm"   # WRITE eQUALITY HOME PAGE URL HERE !
+#myUrl = "file:///" + os.path.dirname(os.path.abspath(__file__)) + "/home.htm"   # WRITE eQUALITY HOME PAGE URL HERE !
+myUrl = "http://www.equality-eur.slb.com"
 browser = webdriver.Firefox()
 browser.get(myUrl)
 browser.implicitly_wait(5)
+
+switchToFrameMainMenu(browser)
 
 """ finding the MatsQuery area"""
 area = browser.find_element_by_xpath("//area[contains(@alt, 'Query Performed Tests')]")
 
 """ clicking on it """
+focusActiveElement(browser)
 test = ActionChains(browser)
 test.click(area)
 test.perform()
@@ -710,6 +699,7 @@ browser.find_element_by_name('test_taken_id').send_keys(listTakenIDRecherche)
 t = browser.find_element_by_name('sabutton')
 
 """clicking on it """
+focusActiveElement(browser)
 t.click()
 t.click() # Click twice in case the first click just re-focused the window.
 t.submit()
@@ -740,10 +730,13 @@ listToCsv( 'Mats.csv', myMatsListResultByTakenID )
 """ going back to home page """
 browser.get(myUrl)
 
+switchToFrameMainMenu(browser)
+
 """ finding the TFLQuery image """
 img = browser.find_element_by_xpath("//img[contains(@alt, 'Test Failed')]")
 
 """ clicking on it """
+focusActiveElement(browser)
 test = ActionChains(browser)
 test.click(img)
 test.perform()
@@ -751,36 +744,36 @@ test.perform()
 """ getting the takenID list linked to the previous Mats """
 TFLTakenID = str(getTFLTakenID(myMatsListResultByTakenID)).replace(" ', '", ",")[2:-2] 
 
-""" writing the list into the takenID input """
-browser.find_element_by_name('test_taken_id').send_keys(TFLTakenID)
+if TFLTakenID != [] :
+    """ writing the list into the takenID input """
+    browser.find_element_by_name('test_taken_id').send_keys(TFLTakenID)
 
-""" finding the submit button """
-t = browser.find_element_by_name('sabutton')
+    """ finding the submit button """
+    t = browser.find_element_by_name('sabutton')
 
-""" clicking on it """
-t.click()
-t.click() # Click twice in case the first click just re-focused the window.
-t.submit()
+    """ clicking on it """
+    focusActiveElement(browser)
+    t.click()
+    t.click() # Click twice in case the first click just re-focused the window.
+    t.submit()
 
-""" getting the result list of the datas we need from this MatsQueryResult page """
-myTFLparser = TFLParser()
-myTFLparser.feedEveryPage(browser)
-myTFLListResultByTakenID = myTFLparser.getResultByTakenID()
+    """ getting the result list of the datas we need from this MatsQueryResult page """
+    myTFLparser = TFLParser()
+    myTFLparser.feedEveryPage(browser)
+    myTFLListResultByTakenID = myTFLparser.getResultByTakenID()
 
 
+    print myTFLListResultByTakenID, TFLTakenID
 
-print myTFLListResultByTakenID, TFLTakenID
+        # stringResultByTakenID = json.dumps(dictResultByTakenID)
+        # with open('resultMats_ByTakenID_v2.txt' , 'wb') as f1:
+        #   f1.write(stringResultByTakenID
 
-# stringResultByTakenID = json.dumps(dictResultByTakenID)
-# with open('resultMats_ByTakenID_v2.txt' , 'wb') as f1:
-#   f1.write(stringResultByTakenID
-
-    
-#writeHead doesn't work now!
-# csvHead = (['takenID'] + ['verifiedDate'] + ['serialNo'] + ['testID'] + ['Status'] + ['failLogLink'])
-
-""" saving it into Mats.csv """
-listToCsv( 'Relative_TFLs.csv', myTFLListResultByTakenID )
+            
+        #writeHead doesn't work now!
+        # csvHead = (['takenID'] + ['verifiedDate'] + ['serialNo'] + ['testID'] + ['Status'] + ['failLogLink'])
+    """ saving it into Mats.csv """
+    listToCsv( 'Relative_TFLs.csv', myTFLListResultByTakenID )
 
 
 
