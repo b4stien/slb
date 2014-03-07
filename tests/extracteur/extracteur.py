@@ -673,35 +673,42 @@ def matsGo(browser, listMatsTakenIDRecherche):
 
     myMatsListResultByTakenID = []
 
-    browser.get(myUrl)
-    # browser.implicitly_wait(5)
-    switchToFrameMainMenu(browser)
+    listMatsTakenIDRechercheSplit = split255(listMatsTakenIDRecherche,maxIdLen)
 
-    """ finding the MatsQuery area"""
-    area = browser.find_element_by_xpath("//area[contains(@alt, 'Query Performed Tests')]")
+    print '=== listMatsTakenIDRechercheSplit === ' , '\n',  listMatsTakenIDRechercheSplit, '\n'
 
-    """ clicking on it """
-    focusActiveElement(browser)
-    test = ActionChains(browser)
-    test.click(area)
-    test.perform()
 
-    """ writing the list in the takenID input """
-    browser.find_element_by_name('test_taken_id').send_keys(listMatsTakenIDRecherche)
+    while listMatsTakenIDRechercheSplit != []:    
 
-    """ finding the submit button """
-    t = browser.find_element_by_name('sabutton')
+        browser.get(myUrl)
+        # browser.implicitly_wait(5)
+        switchToFrameMainMenu(browser)
 
-    """clicking on it """
-    focusActiveElement(browser)
-    t.click()
-    t.click() # Click twice in case the first click just re-focused the window.
-    t.submit()
+        """ finding the MatsQuery area"""
+        area = browser.find_element_by_xpath("//area[contains(@alt, 'Query Performed Tests')]")
 
-    """ getting the result list of the datas we need from this MatsQueryResult page """
-    myMatsparser = MatsParser()
-    myMatsparser.feedEveryPage(browser)
-    myMatsListResultByTakenID = myMatsparser.getResultByTakenID()
+        """ clicking on it """
+        focusActiveElement(browser)
+        test = ActionChains(browser)
+        test.click(area)
+        test.perform()
+        
+        """ writing the list in the takenID input """
+        browser.find_element_by_name('test_taken_id').send_keys(listMatsTakenIDRechercheSplit.pop())
+
+        """ finding the submit button """
+        t = browser.find_element_by_name('sabutton')
+
+        """clicking on it """
+        focusActiveElement(browser)
+        t.click()
+        t.click() # Click twice in case the first click just re-focused the window.
+        t.submit()
+
+        """ getting the result list of the datas we need from this MatsQueryResult page """
+        myMatsparser = MatsParser()
+        myMatsparser.feedEveryPage(browser)
+        myMatsListResultByTakenID.append(myMatsparser.getResultByTakenID())
 
     print '=== listMatsTakenIDRecherche === ' , '\n', listMatsTakenIDRecherche, '\n'
     print '=== myMatsListResultByTakenID ===', '\n', myMatsListResultByTakenID, '\n'
