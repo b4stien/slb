@@ -603,9 +603,9 @@ def switchToFrameMainMenu(myDriver):
             focusDefaultContent(myDriver)
             #myDriver.switch_to_default_content()            
             #t = myDriver.find_element_by_x_path("//frame[contains(@name, 'main_menu')]")
-            print "found element"
+            # print "found element"
             myDriver.switch_to_frame(myDriver.find_element_by_name("main_menu"))
-            print "switched"
+            # print "switched"
             machineInSlbDomain = True
             
         except:
@@ -658,6 +658,115 @@ def focusActiveElement(myDriver):
 def focusDefaultContent(myDriver):
     myDriver.switch_to_default_content()
 
+def split255(seqLong, maxIdLen):
+    seqSplit = []
+    while len(seqLong) > 255:
+        for i in range(0 , maxIdLen):
+            if seqLong[254 - i] ==',':
+                seqSplit.append(seqLong[ : 254 - i ])
+                seqLong = seqLong[ 255 - i : ]
+                break
+    seqSplit.append(seqLong)
+    return seqSplit
+
+def matsGo(browser, listMatsTakenIDRecherche):
+
+    myMatsListResultByTakenID = []
+
+    browser.get(myUrl)
+    # browser.implicitly_wait(5)
+    switchToFrameMainMenu(browser)
+
+    """ finding the MatsQuery area"""
+    area = browser.find_element_by_xpath("//area[contains(@alt, 'Query Performed Tests')]")
+
+    """ clicking on it """
+    focusActiveElement(browser)
+    test = ActionChains(browser)
+    test.click(area)
+    test.perform()
+
+    """ writing the list in the takenID input """
+    browser.find_element_by_name('test_taken_id').send_keys(listMatsTakenIDRecherche)
+
+    """ finding the submit button """
+    t = browser.find_element_by_name('sabutton')
+
+    """clicking on it """
+    focusActiveElement(browser)
+    t.click()
+    t.click() # Click twice in case the first click just re-focused the window.
+    t.submit()
+
+    """ getting the result list of the datas we need from this MatsQueryResult page """
+    myMatsparser = MatsParser()
+    myMatsparser.feedEveryPage(browser)
+    myMatsListResultByTakenID = myMatsparser.getResultByTakenID()
+
+    print '=== listMatsTakenIDRecherche === ' , '\n', listMatsTakenIDRecherche, '\n'
+    print '=== myMatsListResultByTakenID ===', '\n', myMatsListResultByTakenID, '\n'
+
+    # stringResultByTakenID = json.dumps(dictResultByTakenID)
+    # with open('resultMats_ByTakenID_v2.txt' , 'wb') as f1:
+    #   f1.write(stringResultByTakenID
+
+        
+    #writeHead doesn't work now!
+    # csvHead = (['takenID'] + ['verifiedDate'] + ['serialNo'] + ['testID'] + ['Status'] + ['failLogLink'])
+
+    """ saving it into Mats.csv """
+    listToCsv( 'Mats.csv', myMatsListResultByTakenID )
+
+    return myMatsListResultByTakenID
+
+def TFLGo(browser, listTFLTakenIDRecherche,maxIdLen):
+
+    myTFLListResultByTakenID = []
+    listTFLTakenIDRechercheSplit = []
+    listTFLTakenIDRechercheSplit = split255(listTFLTakenIDRecherche,maxIdLen)
+
+    print '=== listTFLTakenIDRechercheSplit === ' , '\n',  listTFLTakenIDRechercheSplit, '\n'
+
+
+    while listTFLTakenIDRechercheSplit != []:
+
+        """ going back to home page """
+        browser.get(myUrl)
+        switchToFrameMainMenu(browser)
+
+        """ finding the TFLQuery image """
+        img = browser.find_element_by_xpath("//img[contains(@alt, 'Test Failed')]")
+
+        """ clicking on it """
+        focusActiveElement(browser)
+        test = ActionChains(browser)
+        test.click(img)
+        test.perform()
+
+        """ writing the list into the takenID input """
+        browser.find_element_by_name('test_taken_id').send_keys(listTFLTakenIDRechercheSplit.pop())
+
+        """ finding the submit button """
+        t = browser.find_element_by_name('sabutton')
+
+        """ clicking on it """
+        focusActiveElement(browser)
+        t.click()
+        t.click() # Click twice in case the first click just re-focused the window.
+        t.submit()
+
+        """ getting the result list of the datas we need from this MatsQueryResult page """
+        myTFLparser = TFLParser()
+        myTFLparser.feedEveryPage(browser)
+        myTFLListResultByTakenID += myTFLparser.getResultByTakenID()
+
+
+    listToCsv( 'Relative_TFLs.csv', myTFLListResultByTakenID )
+
+    print '=== myTFLListResultByTakenID === ' , '\n', myTFLListResultByTakenID, '\n'
+    return myTFLListResultByTakenID
+
+
 
 ########## Test with resultMats.htm #######################################
 
@@ -667,114 +776,26 @@ def focusDefaultContent(myDriver):
 
 """""""""""""""""""""""""""      MAIN     """""""""""""""""""""""""""
 
-
-""" the Mats part """
-
 waitLogin = 15
+maxIdLen = 15
 
 """ loading the eQuality home page on a firefox browser """
+# myUrl is a global variable
 myUrl = "file:///" + os.path.dirname(os.path.abspath(__file__)) + "/home.htm"   # WRITE eQUALITY HOME PAGE URL HERE !
 #myUrl = "http://www.equality-eur.slb.com"
 browser = webdriver.Firefox()
-browser.get(myUrl)
 browser.implicitly_wait(5)
 
-switchToFrameMainMenu(browser)
+""" MatsRecherche """
+listMatsTakenIDRecherche = str([3401783, 3401784, 3401787, 3401790, 3401803]).replace(" ', '", ",")[2:-2]
+myMatsListResultByTakenID = matsGo(browser, listMatsTakenIDRecherche)
 
-""" finding the MatsQuery area"""
-area = browser.find_element_by_xpath("//area[contains(@alt, 'Query Performed Tests')]")
+""" TFLRecherche """
+listTFLTakenIDRecherche = str(getTFLTakenID(myMatsListResultByTakenID) * 20).replace(" ', '", ",")[2:-2]
+print '=====listTFLTakenIDRecherche=== ', ' \n', listTFLTakenIDRecherche , '\n'
 
-""" clicking on it """
-focusActiveElement(browser)
-test = ActionChains(browser)
-test.click(area)
-test.perform()
+myTFLListResultByTakenID = TFLGo(browser,listTFLTakenIDRecherche,maxIdLen)
 
-""" exemple of a TakenID list to look for """
-listTakenIDRecherche = str([3401783, 3401784, 3401787, 3401790, 3401803]).replace(" ', '", ",")[2:-2]
-
-""" writing the list in the takenID input """
-browser.find_element_by_name('test_taken_id').send_keys(listTakenIDRecherche)
-
-""" finding the submit button """
-t = browser.find_element_by_name('sabutton')
-
-"""clicking on it """
-focusActiveElement(browser)
-t.click()
-t.click() # Click twice in case the first click just re-focused the window.
-t.submit()
-
-""" getting the result list of the datas we need from this MatsQueryResult page """
-myMatsparser = MatsParser()
-myMatsparser.feedEveryPage(browser)
-myMatsListResultByTakenID = myMatsparser.getResultByTakenID()
-
-
-print myMatsListResultByTakenID, listTakenIDRecherche
-
-# stringResultByTakenID = json.dumps(dictResultByTakenID)
-# with open('resultMats_ByTakenID_v2.txt' , 'wb') as f1:
-#   f1.write(stringResultByTakenID
-
-    
-#writeHead doesn't work now!
-# csvHead = (['takenID'] + ['verifiedDate'] + ['serialNo'] + ['testID'] + ['Status'] + ['failLogLink'])
-
-""" saving it into Mats.csv """
-listToCsv( 'Mats.csv', myMatsListResultByTakenID )
-
-
- 
-""" the TFL part """
-
-""" going back to home page """
-browser.get(myUrl)
-
-switchToFrameMainMenu(browser)
-
-""" finding the TFLQuery image """
-img = browser.find_element_by_xpath("//img[contains(@alt, 'Test Failed')]")
-
-""" clicking on it """
-focusActiveElement(browser)
-test = ActionChains(browser)
-test.click(img)
-test.perform()
-
-""" getting the takenID list linked to the previous Mats """
-TFLTakenID = str(getTFLTakenID(myMatsListResultByTakenID)).replace(" ', '", ",")[2:-2] 
-
-if TFLTakenID != [] :
-    """ writing the list into the takenID input """
-    browser.find_element_by_name('test_taken_id').send_keys(TFLTakenID)
-
-    """ finding the submit button """
-    t = browser.find_element_by_name('sabutton')
-
-    """ clicking on it """
-    focusActiveElement(browser)
-    t.click()
-    t.click() # Click twice in case the first click just re-focused the window.
-    t.submit()
-
-    """ getting the result list of the datas we need from this MatsQueryResult page """
-    myTFLparser = TFLParser()
-    myTFLparser.feedEveryPage(browser)
-    myTFLListResultByTakenID = myTFLparser.getResultByTakenID()
-
-
-    print myTFLListResultByTakenID, TFLTakenID
-
-        # stringResultByTakenID = json.dumps(dictResultByTakenID)
-        # with open('resultMats_ByTakenID_v2.txt' , 'wb') as f1:
-        #   f1.write(stringResultByTakenID
-
-            
-        #writeHead doesn't work now!
-        # csvHead = (['takenID'] + ['verifiedDate'] + ['serialNo'] + ['testID'] + ['Status'] + ['failLogLink'])
-    """ saving it into Mats.csv """
-    listToCsv( 'Relative_TFLs.csv', myTFLListResultByTakenID )
-
+print  '=== END of Extractor Test==='
 
 
