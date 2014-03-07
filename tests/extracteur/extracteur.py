@@ -672,11 +672,10 @@ def split255(seqLong, maxIdLen):
 def matsGo(browser, listMatsTakenIDRecherche):
 
     myMatsListResultByTakenID = []
+    print '=== listMatsTakenIDRecherche === ' , '\n', listMatsTakenIDRecherche, '\n'
 
     listMatsTakenIDRechercheSplit = split255(listMatsTakenIDRecherche,maxIdLen)
-
     print '=== listMatsTakenIDRechercheSplit === ' , '\n',  listMatsTakenIDRechercheSplit, '\n'
-
 
     while listMatsTakenIDRechercheSplit != []:    
 
@@ -708,9 +707,9 @@ def matsGo(browser, listMatsTakenIDRecherche):
         """ getting the result list of the datas we need from this MatsQueryResult page """
         myMatsparser = MatsParser()
         myMatsparser.feedEveryPage(browser)
-        myMatsListResultByTakenID.append(myMatsparser.getResultByTakenID())
+        # myMatsListResultByTakenID.append(myMatsparser.getResultByTakenID())
+        myMatsListResultByTakenID += myMatsparser.getResultByTakenID()
 
-    print '=== listMatsTakenIDRecherche === ' , '\n', listMatsTakenIDRecherche, '\n'
     print '=== myMatsListResultByTakenID ===', '\n', myMatsListResultByTakenID, '\n'
 
     # stringResultByTakenID = json.dumps(dictResultByTakenID)
@@ -730,10 +729,11 @@ def TFLGo(browser, listTFLTakenIDRecherche,maxIdLen):
 
     myTFLListResultByTakenID = []
     listTFLTakenIDRechercheSplit = []
+
+    print '=====listTFLTakenIDRecherche=== ', ' \n', listTFLTakenIDRecherche , '\n'
+
     listTFLTakenIDRechercheSplit = split255(listTFLTakenIDRecherche,maxIdLen)
-
     print '=== listTFLTakenIDRechercheSplit === ' , '\n',  listTFLTakenIDRechercheSplit, '\n'
-
 
     while listTFLTakenIDRechercheSplit != []:
 
@@ -799,8 +799,6 @@ myMatsListResultByTakenID = matsGo(browser, listMatsTakenIDRecherche)
 
 """ TFLRecherche """
 listTFLTakenIDRecherche = str(getTFLTakenID(myMatsListResultByTakenID) * 20).replace(" ', '", ",")[2:-2]
-print '=====listTFLTakenIDRecherche=== ', ' \n', listTFLTakenIDRecherche , '\n'
-
 myTFLListResultByTakenID = TFLGo(browser,listTFLTakenIDRecherche,maxIdLen)
 
 print  '=== END of Extractor Test==='
