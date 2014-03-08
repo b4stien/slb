@@ -7,8 +7,8 @@ Some explanations about this script :
 1. input : 1 list of MATs IDs (listTakenIDRecherche). Input is made at line 690.
 
 1. output : 2 CSV files showing the infos we need about those MATs. Output are made at lines 734 and 783 : 
-       - Mats.csv : columns = takenID, verifiedDate as timestamp, serialNo, testID, status, failLogLink (when there's one)
-       - Relative_TFLs.csv  : columns = takenID, testID, serialNo, date as timestamp, remarks, repeat Operations
+       - Mats.csv : columns = timestamp, takenID, serialNo, testID, status, failLogLink existence
+       - Relative_TFLs.csv  : columns = timestamp, takenID, serialNo, testID, remarks, repeat Operations
 
 2. process ( in MAIN, starting line 684 ) :
        1 - We log onto eQuality HomePage with an emulated selenium webbrowser
@@ -91,7 +91,7 @@ class MatsParser(HTMLParser):
         self.statusCol = 6
         self.failLogLinkCol = 34
 
-        self.listCol = [ self.takenIDCol, self.modifiedDateCol, self.serialNoCol, \
+        self.listCol = [ self.modifiedDateCol, self.takenIDCol, self.serialNoCol, \
                     self.testIDCol, self.statusCol, self.failLogLinkCol]
 
         self.lengthResultCol = 35
@@ -277,7 +277,7 @@ class MatsParser(HTMLParser):
         if self.tablei == 3 and self.tdi == self.lengthResultCol :            
             r = self.result
             # transform matsTime to matsTimeStamp
-            r[1] = self.timeStamp(r[1])            
+            r[self.listCol.index(self.modifiedDateCol)] = self.timeStamp(r[self.listCol.index(self.modifiedDateCol)])            
                           
             # woID = getDictKey(r, 'woID', 'None')
             # serialNo = getDictKey(r, 'serialNo', 'None')
@@ -345,7 +345,7 @@ class TFLParser(HTMLParser):
         self.RepeatOperationsCol = 21
         self.serialNumberCol = 29
 
-        self.listCol = [ self.takenIDCol, self.testIDCol, self.serialNumberCol, self.DateCol, self.RemarksCol, self.RepeatOperationsCol]
+        self.listCol = [ self.DateCol, self.takenIDCol, self.serialNumberCol, self.testIDCol, self.RemarksCol, self.RepeatOperationsCol]
 
         self.lengthResultCol = 39
 
@@ -523,7 +523,7 @@ class TFLParser(HTMLParser):
         if self.tablei == 3 and self.tdi == self.lengthResultCol :            
             r = self.result
             # transform matsTime to matsTimeStamp
-            r[3] = self.timeStamp(r[3])            
+            r[self.listCol.index(self.DateCol)] = self.timeStamp(r[self.listCol.index(self.DateCol)])            
                           
             # woID = getDictKey(r, 'woID', 'None')
             # serialNo = getDictKey(r, 'serialNo', 'None')
@@ -798,7 +798,7 @@ listMatsTakenIDRecherche = str([3401783, 3401784, 3401787, 3401790, 3401803]).re
 myMatsListResultByTakenID = matsGo(browser, listMatsTakenIDRecherche)
 
 """ TFLRecherche """
-listTFLTakenIDRecherche = str(getTFLTakenID(myMatsListResultByTakenID) * 20).replace(" ', '", ",")[2:-2]
+listTFLTakenIDRecherche = str(getTFLTakenID(myMatsListResultByTakenID)*20).replace(" ', '", ",").replace("'","")[2:-2]
 myTFLListResultByTakenID = TFLGo(browser,listTFLTakenIDRecherche,maxIdLen)
 
 print  '=== END of Extractor Test==='
