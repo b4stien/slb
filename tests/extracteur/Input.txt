@@ -1,0 +1,16 @@
+{
+  "name": "Exemple Config File",
+  "generatedTimestamp": 1391000923,
+  "families": [
+    {
+      "name": "Family 1",
+      "serialNumbers": ["SN10101212", "SN10101313", "SN10101315", "SN10101319"],
+      "orderedTestIDs": ["TID010102", "TID010114", "TID010109"]
+    },
+    {
+      "name": "Family 2",
+      "serialNumbers": ["SN20101212", "SN20101313"],
+      "orderedTestIDs": ["TID020102", "TID020114", "TID020109"]
+    }
+  ]
+}

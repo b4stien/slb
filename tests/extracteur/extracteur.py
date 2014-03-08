@@ -583,10 +583,6 @@ def getTFLTakenID(listResult) :
     return TFLTakenID
 
 
-
-
-
-
 def switchToFrameMainMenu(myDriver): 
     #Loop to access SLB Domain.
     #If not in SLB Domain, eQ prompts a basic HTTP authentication (modal
@@ -664,6 +660,16 @@ def split255(seqLong, maxIdLen):
                 break
     seqSplit.append(seqLong)
     return seqSplit
+
+def getInput(relativePath):
+    JsonInput = open( relativePath, "r")
+    contenu = JsonInput.read()
+
+    config = json.loads(contenu)
+    Input = [sn for family in config['families'] for sn in family['serialNumbers']]
+    Input = ', '.join(Input)
+    JsonInput.close()
+    return Input.encode("utf-8")
 
 def matsGo(browser, listMats):
 
@@ -790,7 +796,7 @@ browser = webdriver.Firefox()
 browser.implicitly_wait(5)
 
 """ MatsRecherche """
-listMats = str([3401783, 3401784, 3401787, 3401790, 3401803]).replace(" ', '", ",")[2:-2]
+listMats = getInput("Input.txt")
 myMatsListResult = matsGo(browser, listMats)
 
 """ TFLRecherche """
