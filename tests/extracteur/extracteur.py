@@ -4,13 +4,13 @@
 """  
 Some explanations about this script :
 
-1. input : 1 list of MATs IDs (listTakenIDRecherche). Input is made at line 690.
+1. input : 1 list of serial numbers (listTakenIDRecherche). Input is made at line 797.
 
-1. output : 2 CSV files showing the infos we need about those MATs. Output are made at lines 734 and 783 : 
-       - Mats.csv : columns = timestamp, takenID, serialNo, testID, status, failLogLink existence
+1. output : 2 CSV files showing the infos we need about those MATs. Output are made at lines 798 and 802 : 
+       - Mats.csv : columns = timestamp, takenID, serialNo, testID, status, failLogLink link when it exists
        - Relative_TFLs.csv  : columns = timestamp, takenID, serialNo, testID, remarks, repeat Operations
 
-2. process ( in MAIN, starting line 684 ) :
+2. process ( in MAIN, starting line 783 ) :
        1 - We log onto eQuality HomePage with an emulated selenium webbrowser
        2 - We go to the MatsResult Page that matches our input list, using selenium API.
        3 - We parse it and save what we need into Mats.csv.
@@ -28,7 +28,7 @@ Some explanations about this script :
                      - handle_data ( self, data )               : handles data
                      - endOfTr ( self )                         : appends current result to global result
                      - getResultByTakenID ( self )              : gets global result
-       - TFLParser ( line 317 ):
+       - TFLParser ( line 314 ):
            Methods : - initTemporaryResultsAndCounters ( self ) : resets current result and counters
                      - feed ( self, html )                      : feeds one page
                      - feedEveryPage ( self, browser )          : feeds all of the MatsResult pages
@@ -185,12 +185,14 @@ class MatsParser(HTMLParser):
         elif (tag == 'b' or tag == 'strong') and self.td:
             """bold tags also need to be counted, especially for the feedEveryPage method """
             self.b = True
-            self.bi += 1 
+            self.bi += 1
             
-        elif tag == 'a' and self.td and self.tdi == self.failLogLinkCol:
+        elif (tag == 'a') and self.td and self.tdi == self.failLogLinkCol:
             """ in case of link to a TFL in the row, adds 'true' at the right position of result """
-            self.result[self.listCol.index(self.failLogLinkCol)] = str(True)
-
+            for name, value in attrs :
+                if name == "href" :
+                    self.result[self.listCol.index(self.failLogLinkCol)] = value
+            
     def handle_endtag(self, tag):
         
         if tag == 'table':
@@ -218,12 +220,6 @@ class MatsParser(HTMLParser):
         elif tag == 'td':
             self.td = False
             self.b = False
-
-            """ in case of no link to a TFL in the row, adds 'false' at the right position of result """
-            if ( self.tdi == self.failLogLinkCol
-                and self.result[self.listCol.index(self.failLogLinkCol)] != 'True'
-                ):
-                self.result[self.listCol.index(self.failLogLinkCol)] = str(False)
 
 
             self.tdi += 1 
@@ -268,7 +264,7 @@ class MatsParser(HTMLParser):
                     if self.result[indexCol] == '':
                         self.result[indexCol] = data.replace("\xc2\xa0", " ")
                     else:
-                        self.result[indexCol] += ' ' + data.replace("\xc2\xa0", " ")
+                        self.result[indexCol] += ' ' + data.replace("\xc2\xa0", " ")        
 
     """ called at the end of each html table row, endOfTr appends the current result to resultsByTakenID """            
     def endOfTr(self):
@@ -582,7 +578,7 @@ def listToCsv ( csvFileName, listName):
 def getTFLTakenID(listResult) :
     TFLTakenID = []
     for item in listResult :
-        if item[5] == "True" :
+        if str(item[5]) != "" :
             TFLTakenID.append(item[0])
     return TFLTakenID
 
@@ -591,7 +587,7 @@ def getTFLTakenID(listResult) :
 
 
 
-def switchToFrameMainMenu(myDriver):
+def switchToFrameMainMenu(myDriver): 
     #Loop to access SLB Domain.
     #If not in SLB Domain, eQ prompts a basic HTTP authentication (modal
     #dialog) that cannot be handled by Selenium. The user must enter his
@@ -669,15 +665,15 @@ def split255(seqLong, maxIdLen):
     seqSplit.append(seqLong)
     return seqSplit
 
-def matsGo(browser, listMatsTakenIDRecherche):
+def matsGo(browser, listMats):
 
-    myMatsListResultByTakenID = []
-    print '=== listMatsTakenIDRecherche === ' , '\n', listMatsTakenIDRecherche, '\n'
+    myMatsListResult = []
+    print '=== listMats === ' , '\n', listMats, '\n'
 
-    listMatsTakenIDRechercheSplit = split255(listMatsTakenIDRecherche,maxIdLen)
-    print '=== listMatsTakenIDRechercheSplit === ' , '\n',  listMatsTakenIDRechercheSplit, '\n'
+    listMatsSplit = split255(listMats,maxIdLen)
+    print '=== listMatsSplit === ' , '\n',  listMatsSplit, '\n'
 
-    while listMatsTakenIDRechercheSplit != []:    
+    while listMatsSplit :    
 
         browser.get(myUrl)
         # browser.implicitly_wait(5)
@@ -693,7 +689,7 @@ def matsGo(browser, listMatsTakenIDRecherche):
         test.perform()
         
         """ writing the list in the takenID input """
-        browser.find_element_by_name('test_taken_id').send_keys(listMatsTakenIDRechercheSplit.pop())
+        browser.find_element_by_name('serial_no').send_keys(listMatsSplit.pop())
 
         """ finding the submit button """
         t = browser.find_element_by_name('sabutton')
@@ -708,9 +704,9 @@ def matsGo(browser, listMatsTakenIDRecherche):
         myMatsparser = MatsParser()
         myMatsparser.feedEveryPage(browser)
         # myMatsListResultByTakenID.append(myMatsparser.getResultByTakenID())
-        myMatsListResultByTakenID += myMatsparser.getResultByTakenID()
+        myMatsListResult += myMatsparser.getResultByTakenID()
 
-    print '=== myMatsListResultByTakenID ===', '\n', myMatsListResultByTakenID, '\n'
+    print '=== myMatsListResult ===', '\n', myMatsListResult, '\n'
 
     # stringResultByTakenID = json.dumps(dictResultByTakenID)
     # with open('resultMats_ByTakenID_v2.txt' , 'wb') as f1:
@@ -721,22 +717,22 @@ def matsGo(browser, listMatsTakenIDRecherche):
     # csvHead = (['takenID'] + ['verifiedDate'] + ['serialNo'] + ['testID'] + ['Status'] + ['failLogLink'])
 
     """ saving it into Mats.csv """
-    listToCsv( 'Mats.csv', myMatsListResultByTakenID )
+    listToCsv( 'Mats.csv', myMatsListResult )
 
-    return myMatsListResultByTakenID
+    return myMatsListResult
 
-def TFLGo(browser, listTFLTakenIDRecherche,maxIdLen):
+def TFLGo(browser, listTFL ,maxIdLen):
 
-    myTFLListResultByTakenID = []
-    listTFLTakenIDRechercheSplit = []
+    myTFLListResult = []
+    listTFLSplit = []
 
-    print '=====listTFLTakenIDRecherche=== ', ' \n', listTFLTakenIDRecherche , '\n'
+    print '=====listTFL=== ', ' \n', listTFL, '\n'
 
-    listTFLTakenIDRechercheSplit = split255(listTFLTakenIDRecherche,maxIdLen)
-    print '=== listTFLTakenIDRechercheSplit === ' , '\n',  listTFLTakenIDRechercheSplit, '\n'
+    listTFLSplit = split255(listTFL,maxIdLen)
+    print '=== listTFLSplit === ' , '\n',  listTFLSplit, '\n'
 
-    while listTFLTakenIDRechercheSplit != []:
-
+    while listTFLSplit :
+  
         """ going back to home page """
         browser.get(myUrl)
         switchToFrameMainMenu(browser)
@@ -751,7 +747,7 @@ def TFLGo(browser, listTFLTakenIDRecherche,maxIdLen):
         test.perform()
 
         """ writing the list into the takenID input """
-        browser.find_element_by_name('test_taken_id').send_keys(listTFLTakenIDRechercheSplit.pop())
+        browser.find_element_by_name('test_taken_id').send_keys(listTFLSplit.pop())
 
         """ finding the submit button """
         t = browser.find_element_by_name('sabutton')
@@ -765,13 +761,12 @@ def TFLGo(browser, listTFLTakenIDRecherche,maxIdLen):
         """ getting the result list of the datas we need from this MatsQueryResult page """
         myTFLparser = TFLParser()
         myTFLparser.feedEveryPage(browser)
-        myTFLListResultByTakenID += myTFLparser.getResultByTakenID()
+        myTFLListResult += myTFLparser.getResultByTakenID()        
 
+    listToCsv( 'Relative_TFLs.csv', myTFLListResult )
 
-    listToCsv( 'Relative_TFLs.csv', myTFLListResultByTakenID )
-
-    print '=== myTFLListResultByTakenID === ' , '\n', myTFLListResultByTakenID, '\n'
-    return myTFLListResultByTakenID
+    print '=== myTFLListResult === ' , '\n', myTFLListResult, '\n'
+    return myTFLListResult
 
 
 
@@ -782,6 +777,7 @@ def TFLGo(browser, listTFLTakenIDRecherche,maxIdLen):
 
 
 """""""""""""""""""""""""""      MAIN     """""""""""""""""""""""""""
+
 
 waitLogin = 15
 maxIdLen = 15
@@ -794,12 +790,12 @@ browser = webdriver.Firefox()
 browser.implicitly_wait(5)
 
 """ MatsRecherche """
-listMatsTakenIDRecherche = str([3401783, 3401784, 3401787, 3401790, 3401803]).replace(" ', '", ",")[2:-2]
-myMatsListResultByTakenID = matsGo(browser, listMatsTakenIDRecherche)
+listMats = str([3401783, 3401784, 3401787, 3401790, 3401803]).replace(" ', '", ",")[2:-2]
+myMatsListResult = matsGo(browser, listMats)
 
 """ TFLRecherche """
-listTFLTakenIDRecherche = str(getTFLTakenID(myMatsListResultByTakenID)*20).replace(" ', '", ",").replace("'","")[2:-2]
-myTFLListResultByTakenID = TFLGo(browser,listTFLTakenIDRecherche,maxIdLen)
+listTFL = str(getTFLTakenID(myMatsListResult)).replace(" ', '", ",").replace("'","")[2:-2]
+myTFLListResult = TFLGo(browser,listTFL,maxIdLen)
 
 print  '=== END of Extractor Test==='
 
