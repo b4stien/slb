@@ -3,3 +3,7 @@ node_modules
 
 # JS files are built using: `grunt coffee`
 js/*.js
+
+# local and config files have to be manualy inserted, see README
+local
+visualisatorConfig.json
