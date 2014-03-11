@@ -1,6 +1,7 @@
-class Family extends Backbone.Collection
+class Family extends Backbone.Model
 
-  model: Tool
+  initialize: () ->
+    @tools = new Backbone.Collection()
 
 
 class Tool extends Backbone.Model
@@ -10,7 +11,9 @@ class Tool extends Backbone.Model
 
   lastDate: (testID) ->
     testLogs = _.filter @logs, (log) -> log.testID == testID
-    moment _.last(testLogs).timestamp, 'X'
+    if _.last(testLogs)
+      return moment _.last(testLogs).timestamp, 'X'
+    return undefined
 
   insertLog: (log) ->
     @logs.splice _.sortedIndex(@logs, log, (log) -> log.timestamp), 0, log

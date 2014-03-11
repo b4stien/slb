@@ -45,12 +45,12 @@ $(document).ready(function() {
 
   _.each(window.mainConfig.families, function(rawFamily) {
     var family = new Family();
-    family.tests = rawFamily.orderedTestIDs;
-    family.name = rawFamily.name;
+    family.set('tests', rawFamily.orderedTestIDs);
+    family.set('name', rawFamily.name);
 
     _.each(rawFamily.serialNumbers, function(sn) {
       var tool = new Tool({sn: sn, tests: rawFamily.orderedTestIDs});
-      family.add(tool);
+      family.tools.add(tool);
       window.tools[sn] = tool;
     });
 
