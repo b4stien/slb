@@ -12,8 +12,11 @@
   <script type="text/javascript" src="js/libs/underscore.js"></script>
   <script type="text/javascript" src="js/libs/bootstrap.js"></script>
   <script type="text/javascript" src="js/libs/backbone.js"></script>
+  <script type="text/javascript" src="js/libs/moment.js"></script>
 
   <!-- Application -->
+  <script type="text/javascript" src="js/objects.js"></script>
+  <script type="text/javascript" src="js/views.js"></script>
   <script type="text/javascript" src="js/app.js"></script>
 </head>
 
@@ -25,12 +28,53 @@
   </div>
 </nav>
 
+<div class="container" id="main">
+
+</div>
+
 <script type="text/javascript">
 window.currentPathURL = window.location.href.split('/').slice(0, -1).join('/');
-window.configURL = [currentPathURL, 'config.json'].join('/');
+window.visualisatorConfigURL = [currentPathURL, 'visualisatorConfig.json'].join('/');
 
 $(document).ready(function() {
-  window.config = Utils.getFileJSON(configURL);
+  window.visualisatorConfig = Utils.getJSONFile(visualisatorConfigURL);
+  window.mainConfig = Utils.getJSONFile(window.visualisatorConfig.mainConfigPath);
+
+  window.families = [];
+  window.tools = {};
+
+  _.each(window.mainConfig.families, function(rawFamily) {
+    var family = new Family();
+    family.tests = rawFamily.orderedTestIDs;
+    family.name = rawFamily.name;
+
+    _.each(rawFamily.serialNumbers, function(sn) {
+      var tool = new Tool({sn: sn, tests: rawFamily.orderedTestIDs});
+      family.add(tool);
+      window.tools[sn] = tool;
+    });
+
+    window.families.push(family);
+  });
+
+  var mats = Utils.getCSVFile(window.visualisatorConfig.tflsLog)
+  _.each(mats, function(mat) {
+    if(_.has(window.tools, mat[2])) {
+      window.tools[mat[2]].parseMat(mat);
+    }
+  });
+
+  var tfls = Utils.getCSVFile(window.visualisatorConfig.matsLog)
+  _.each(tfls, function(tfl) {
+    if(_.has(window.tools, tfl[2])) {
+      window.tools[tfl[2]].parseTfl(tfl);
+    }
+  });
+
+  _.each(window.families, function(family) {
+    var familyView = new FamilyView(family);
+    $('#main').append(familyView.render());
+  });
 });
 </script>
 
