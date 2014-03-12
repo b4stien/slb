@@ -579,7 +579,8 @@ def getTFLTakenID(listResult) :
     TFLTakenID = []
     for item in listResult :
         if str(item[5]) != "" :
-            TFLTakenID.append(item[0])
+            TFLTakenID.append(item[1])
+    print TFLTakenID
     return TFLTakenID
 
 
@@ -666,6 +667,7 @@ def getInput(relativePath):
     contenu = JsonInput.read()
 
     config = json.loads(contenu)
+    
     Input = [sn for family in config['families'] for sn in family['serialNumbers']]
     Input = ', '.join(Input)
     JsonInput.close()
@@ -800,7 +802,7 @@ listMats = getInput("Input.txt")
 myMatsListResult = matsGo(browser, listMats)
 
 """ TFLRecherche """
-listTFL = str(getTFLTakenID(myMatsListResult)).replace(" ', '", ",").replace("'","")[2:-2]
+listTFL = str(getTFLTakenID(myMatsListResult)).replace(" ', '", ",").replace("'","")[1:-2]
 myTFLListResult = TFLGo(browser,listTFL,maxIdLen)
 
 print  '=== END of Extractor Test==='
