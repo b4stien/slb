@@ -580,7 +580,7 @@ def getTFLTakenID(listResult) :
     for item in listResult :
         if str(item[5]) != "" :
             TFLTakenID.append(item[1])
-    print TFLTakenID
+    print '=== listTFLTakenID === ' , '\n', TFLTakenID, '\n'
     return TFLTakenID
 
 
@@ -676,7 +676,7 @@ def getInput(relativePath):
 def matsGo(browser, listMats):
 
     myMatsListResult = []
-    print '=== listMats === ' , '\n', listMats, '\n'
+    print '=== strListMats === ' , '\n', listMats, '\n'
 
     listMatsSplit = split255(listMats,maxIdLen)
     print '=== listMatsSplit === ' , '\n',  listMatsSplit, '\n'
@@ -734,7 +734,7 @@ def TFLGo(browser, listTFL ,maxIdLen):
     myTFLListResult = []
     listTFLSplit = []
 
-    print '=====listTFL=== ', ' \n', listTFL, '\n'
+    print '=====strListTFL=== ', ' \n', listTFL, '\n'
 
     listTFLSplit = split255(listTFL,maxIdLen)
     print '=== listTFLSplit === ' , '\n',  listTFLSplit, '\n'
