@@ -10,24 +10,24 @@ class FamilyView
 
       <div class='form-group'>
         <label><b>Family name</b></label>
-        <input class='form-control family-name' type='text' placeholder='Family name'>
+        <input class='form-control family-name' type='text' placeholder='Family name' value='<%= family.get('name') %>'>
       </div>
 
       <div class='row'>
         <div class='col-xs-4'>
-          <h5><b>Serial numbers</b><a href='#' class='add-sn' style='color:#333; float:right; margin-right:12px;'><i class='fa fa-plus-circle'></i></a></h5>
+          <h5><b>Tools</b><a href='#' class='add-sn' style='color:#333; float:right; margin-right:12px;'><i class='fa fa-plus-circle'></i></a></h5>
           <div class='serial-numbers'></div>
         </div>
 
         <div class='col-xs-8'>
-          <h5><b>Test IDs (ordered)</b><a href='#' class='add-test' style='color:#333; float:right; margin-right:12px;'><i class='fa fa-plus-circle'></i></a></h5>
+          <h5><b>Tests (ordered)</b><a href='#' class='add-test' style='color:#333; float:right; margin-right:12px;'><i class='fa fa-plus-circle'></i></a></h5>
           <div class='tests'></div>
         </div>
       </div>
     </div>"
 
-  serialNumberTpl: _.template "<div class='form-group'><div class='input-group'>
-      <input type='text' class='form-control' placeholder='Serial number'>
+  toolTpl: _.template "<div class='form-group'><div class='input-group'>
+      <input type='text' class='form-control' placeholder='Serial number' value='<%= serialNumber %>'>
       <span class='input-group-btn'>
         <button class='remove btn btn-default' type='button'><i class='fa fa-trash-o'></i></button>
       </span>
@@ -35,20 +35,42 @@ class FamilyView
 
   testTpl: _.template "<div class='test form-inline' style='margin-bottom:15px;'>
       <div class='form-group'>
-        <input style='width:257px;' type='text' class='test-name form-control' placeholder='Test name'>
+        <input style='width:257px;' type='text' class='test-name form-control' placeholder='Test name' value='<%= name %>'>
       </div>
       <div class='form-group'>
-        <input type='text' class='test-id form-control' placeholder='Test ID'>
+        <input type='text' class='test-id form-control' placeholder='Test ID' value='<%= id %>'>
       </div>
       <button class='remove btn btn-default' type='button'><i class='fa fa-trash-o'></i></button>
     </div>"
 
+  buildTest: (test) ->
+    jQtest = $ @testTpl test
+
+    jQtest.on 'click', '.remove', () =>
+      jQtest.remove()
+      @$.find('.tests').trigger 'change'
+
+  buildTool: (tool) ->
+    jQtool = $ @toolTpl tool
+
+    jQtool.on 'click', '.remove', () =>
+      jQtool.remove()
+      @$.find('.serial-numbers').trigger 'change'
+
   render: () ->
-    @$.html @tpl()
+    @$.html @tpl family: @family
+
+    for serialNumber in @family.get 'tools'
+      jQtool = @buildTool serialNumber: serialNumber
+      @$.find('.serial-numbers').append jQtool
+
+    for test in @family.get 'tests'
+      jQtests = @buildTest test
+      @$.find('.tests').append jQtests
 
     @$.find('.close').on 'click', (e) =>
       window.families = _.without window.families, @family
-      window.stampConfig()
+      window.generateConfig()
       @el.remove()
 
     @$.find('.family-name').on 'change keyup', (e) =>
@@ -70,11 +92,7 @@ class FamilyView
       @family.set 'tools', sns
 
     @$.find('.add-test').on 'click', (e) =>
-      test = $ @testTpl()
-
-      test.on 'click', '.remove', () =>
-        test.remove()
-        @$.find('.tests').trigger 'change'
+      test = @buildTest name: '', id: ''
 
       @$.find('.tests').append test
       @$.find('.tests').trigger 'change'
@@ -82,11 +100,7 @@ class FamilyView
 
 
     @$.find('.add-sn').on 'click', (e) =>
-      sn = $ @serialNumberTpl()
-
-      sn.on 'click', '.remove', () =>
-        sn.remove()
-        @$.find('.serial-numbers').trigger 'change'
+      sn = @buildTool serialNumber: ''
 
       @$.find('.serial-numbers').append sn
       @$.find('.serial-numbers').trigger 'change'

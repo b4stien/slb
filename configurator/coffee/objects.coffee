@@ -8,8 +8,13 @@ class Family extends Backbone.Model
   buildConfig: () ->
     config = {}
 
-    config['name'] = @get('name')
-    config['serialNumbers'] = @get('tools')
-    config['orderedTestIDs'] = @get('tests')
+    config['name'] = @get 'name'
+    config['serialNumbers'] = @get 'tools'
+    config['orderedTests'] = @get 'tests'
 
     return config
+
+  parseFamily: (family) ->
+    @set 'name', family['name']
+    @set 'tools', family['serialNumbers']
+    @set 'tests', family['orderedTests']
