@@ -2,6 +2,7 @@ class Utils
   buildConfig: () ->
     config = {}
     config['name'] = $('#cfg-config-name').val()
+    config['type'] = 'serialNumbers'
     config['generatedTimestamp'] = $('#cfg-config-timestamp').val()
 
     config['families'] = []
