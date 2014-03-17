@@ -1,0 +1,45 @@
+{
+  "name": "A config file",
+  "type": "date",
+  "date": "05-27-1990",
+  "generatedTimestamp": "1395047388",
+  "families": [
+    {
+      "name": "First family",
+      "serialNumbers": [
+        "Serial.Number.1"
+      ],
+      "orderedTests": [
+        {
+          "name": "First test",
+          "id": "TEST.ID.1"
+        },
+        {
+          "name": "Second test",
+          "id": "TEST.ID.2"
+        }
+      ]
+    },
+    {
+      "name": "Second family",
+      "serialNumbers": [
+        "SERIAL.NUMBER.2",
+        "SERIAL.NUMBER.3"
+      ],
+      "orderedTests": [
+        {
+          "name": "Test Mama",
+          "id": "TEST.ID.3"
+        },
+        {
+          "name": "Test Nana",
+          "id": "TEST.ID.4"
+        },
+        {
+          "name": "Test Oaoa",
+          "id": "TEST.ID.5"
+        }
+      ]
+    }
+  ]
+}
