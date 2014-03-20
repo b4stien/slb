@@ -51,12 +51,25 @@
           <label for="cfg-config-name"><b>Config name</b></label>
           <input class="form-control" id="cfg-config-name" name="cfg-config-name" type="text"  placeholder="Config name">
         </div>
+
+        <div class="form-group">
+          <label for="cfg-config-type"><b>Type</b></label>
+          <select class="form-control" id="cfg-config-type" name="cfg-config-type">
+            <option value="serialNumbers">Serial Numbers</option>
+            <option value="date">Date</option>
+          </select>
+        </div>
       </div>
 
       <div class="col-xs-6">
         <div class="form-group">
           <label for="cfg-config-timestamp"><b>Generated (timestamp)</b></label>
           <input class="form-control" id="cfg-config-timestamp" name="cfg-config-timestamp" type="text" value="" disabled>
+        </div>
+
+        <div class="form-group" style="display: none;">
+          <label for="cfg-config-date"><b>Date</b></label>
+          <input class="form-control" id="cfg-config-date" name="cfg-config-date" type="text" value="">
         </div>
       </div>
     </div>
@@ -111,6 +124,7 @@
 <script type="text/javascript">
 
 window.families = [];
+window.configType = 'serialNumbers';
 
 window.generateConfig = function(stamp) {
   if(stamp === undefined || stamp === true) {
@@ -126,11 +140,12 @@ window.addAlert = function(category, message) {
 }
 
 window.addFamily = function(familyJSON) {
-  var family = new Family(),
+  var family = new Family(window.configType),
       stamp = true;
   window.families.push(family);
 
   if (familyJSON !== undefined) {
+    familyJSON['configType'] = window.configType;
     family.parseFamily(familyJSON);
     stamp = false;
   }
@@ -146,6 +161,22 @@ window.addFamily = function(familyJSON) {
   });
 
   window.generateConfig(stamp);
+}
+
+window.changeConfigType = function() {
+  window.configType = $('#cfg-config-type').val();
+
+  if (configType === 'date') {
+    $('#cfg-config-date').parents('.form-group').show();
+  } else {
+    $('#cfg-config-date').parents('.form-group').hide();
+  }
+
+  _.each(window.families, function(family) {
+    family.setConfigType(window.configType);
+  });
+
+  window.generateConfig();
 }
 
 window.importConfigFile = function(file) {
@@ -166,6 +197,18 @@ window.importConfigFile = function(file) {
     }
 
     $('#cfg-config-name').val(config['name']);
+
+    window.configType = config['type'];
+    if (window.configType === 'serialNumbers') {
+      $('#cfg-config-type option[value="serialNumbers"]').prop('selected', true);
+      $('#cfg-config-date').parents('.form-group').hide();
+    }
+    else if (window.configType === 'date') {
+      $('#cfg-config-type option[value="date"]').prop('selected', true);
+      $('#cfg-config-date').val(config['date']);
+      $('#cfg-config-date').parents('.form-group').show();
+    }
+
     $('#cfg-config-timestamp').val(config['generatedTimestamp']);
 
     window.families = [];
@@ -183,13 +226,19 @@ $(document).ready(function() {
   window.addFamily();
   window.generateConfig();
 
-  $('#add-family').on('click', function(e) {
-    window.addFamily();
-    e.preventDefault();
-  });
+  $('#cfg-config-type').on('change', window.changeConfigType);
 
   $('#cfg-config-name').on('change keyup', function() {
     window.generateConfig();
+  });
+
+  $('#cfg-config-date').on('change keyup', function() {
+    window.generateConfig();
+  });
+
+  $('#add-family').on('click', function(e) {
+    window.addFamily();
+    e.preventDefault();
   });
 
   $('#download-config').on('click', function(e) {

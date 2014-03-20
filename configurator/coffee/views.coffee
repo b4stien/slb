@@ -5,6 +5,9 @@ class FamilyView
     @el = el
     @$ = @el
 
+    @family.on 'change:configType', () =>
+      @render()
+
   tpl: _.template "<div class='well well-sm'>
       <button type='button' class='close'>×</button>
 
@@ -14,9 +17,7 @@ class FamilyView
       </div>
 
       <div class='row'>
-        <div class='col-xs-4'>
-          <h5><b>Tools</b><a href='#' class='add-sn' style='color:#333; float:right; margin-right:12px;'><i class='fa fa-plus-circle'></i></a></h5>
-          <div class='serial-numbers'></div>
+        <div class='col-xs-4 family-config-type-specific'>
         </div>
 
         <div class='col-xs-8'>
@@ -25,6 +26,12 @@ class FamilyView
         </div>
       </div>
     </div>"
+
+  serialNumbersTpl : _.template "<h5><b>Tools</b><a href='#' class='add-sn' style='color:#333; float:right; margin-right:12px;'><i class='fa fa-plus-circle'></i></a></h5>
+  <div class='serial-numbers'></div>"
+
+  dateTpl : _.template "<h5><b>Serial numbers prefix</b></h5>
+    <input class='form-control family-serial-numbers-prefix' type='text' placeholder='' value='<%= family.get('serialNumbersPrefix') %>'>"
 
   toolTpl: _.template "<div class='form-group'><div class='input-group'>
       <input type='text' class='form-control' placeholder='Serial number' value='<%= serialNumber %>'>
@@ -60,6 +67,14 @@ class FamilyView
   render: () ->
     @$.html @tpl family: @family
 
+    if @family.get('configType') == 'serialNumbers'
+      specificTpl = @serialNumbersTpl
+
+    else if @family.get('configType') == 'date'
+      specificTpl = @dateTpl
+
+    @$.find('.family-config-type-specific').html specificTpl family: @family
+
     for serialNumber in @family.get 'tools'
       jQtool = @buildTool serialNumber: serialNumber
       @$.find('.serial-numbers').append jQtool
@@ -90,6 +105,9 @@ class FamilyView
       @$.find('.serial-numbers').find('input').each (idx, el) ->
         sns.push $(el).val()
       @family.set 'tools', sns
+
+    @$.find('.family-serial-numbers-prefix').on 'change keyup', (e) =>
+      @family.set 'serialNumbersPrefix', $(e.currentTarget).val()
 
     @$.find('.add-test').on 'click', (e) =>
       test = @buildTest name: '', id: ''

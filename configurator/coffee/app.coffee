@@ -2,7 +2,11 @@ class Utils
   buildConfig: () ->
     config = {}
     config['name'] = $('#cfg-config-name').val()
-    config['type'] = 'serialNumbers'
+
+    config['type'] = $('#cfg-config-type').val()
+    if config['type'] == 'date'
+      config['date'] = $('#cfg-config-date').val()
+
     config['generatedTimestamp'] = $('#cfg-config-timestamp').val()
 
     config['families'] = []
@@ -18,7 +22,7 @@ class Utils
       if not _.has config, prop
         return false
 
-    types = ['serialNumbers', 'dates']
+    types = ['serialNumbers', 'date']
     if config['type'] not in types
       return false
 
