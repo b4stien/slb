@@ -579,7 +579,8 @@ def getTFLTakenID(listResult) :
     TFLTakenID = []
     for item in listResult :
         if str(item[5]) != "" :
-            TFLTakenID.append(item[0])
+            TFLTakenID.append(item[1])
+    print '=== listTFLTakenID === ' , '\n', TFLTakenID, '\n'
     return TFLTakenID
 
 
@@ -663,18 +664,28 @@ def split255(seqLong, maxIdLen):
 
 def getInput(relativePath):
     JsonInput = open( relativePath, "r")
-    contenu = JsonInput.read()
+    buff = JsonInput.read()
+    monInput = dict()
+    config = json.loads(buff)
+    monType = config['type']
+    
+    if monType == "serialNumbers" :
+        contenu = [sn for family in config['families'] for sn in family['serialNumbers']]
+        contenu = ', '.join(contenu)
+    elif monType == "date" :
+        contenu = config['date']
 
-    config = json.loads(contenu)
-    Input = [sn for family in config['families'] for sn in family['serialNumbers']]
-    Input = ', '.join(Input)
+    monInput['type'] = monType.encode("utf-8")
+    monInput['contenu'] = contenu.encode("utf-8")
     JsonInput.close()
-    return Input.encode("utf-8")
 
-def matsGo(browser, listMats):
+    print '=== monInput === ' , '\n', monInput, '\n'
+    return monInput
+
+def matsGoSN(browser, listMats):
 
     myMatsListResult = []
-    print '=== listMats === ' , '\n', listMats, '\n'
+    print '=== strListMats === ' , '\n', listMats, '\n'
 
     listMatsSplit = split255(listMats,maxIdLen)
     print '=== listMatsSplit === ' , '\n',  listMatsSplit, '\n'
@@ -727,12 +738,73 @@ def matsGo(browser, listMats):
 
     return myMatsListResult
 
+def matsGoDate(browser, date): # we chose the "performed date" input, might need a change here if we'd rather choose "modified date"
+    inputNameSelect = 'performed_date_Op'
+    inputNameQuery = 'performed_date'
+    
+    print '=== MatsRechercheDate === ' , '\n', inputNameQuery, ' >= ', date, '\n'
+
+    browser.get(myUrl)
+    # browser.implicitly_wait(5)
+    switchToFrameMainMenu(browser)
+
+    """ finding the MatsQuery area"""
+    area = browser.find_element_by_xpath("//area[contains(@alt, 'Query Performed Tests')]")
+
+    """ clicking on it """
+    focusActiveElement(browser)
+    test = ActionChains(browser)
+    test.click(area)
+    test.perform()
+
+    """ writing the list in the date input """
+    browser.find_element_by_name(inputNameQuery).send_keys(date)
+    
+    """ writing the list in the Performed Date input """
+    inputElement = browser.find_element_by_name(inputNameSelect)
+    inputElement.click()
+
+    allOptions = inputElement.find_elements_by_tag_name("option")
+    for option in allOptions:
+        if option.get_attribute('value') == '>=': # indicating we want all tests performed after the specified date
+            option.click()
+
+    """ finding the submit button """
+    t = browser.find_element_by_name('sabutton')
+
+    """clicking on it """
+    focusActiveElement(browser)
+    t.click()
+    t.click() # Click twice in case the first click just re-focused the window.
+    t.submit()
+
+    """ getting the result list of the datas we need from this MatsQueryResult page """
+    myMatsparser = MatsParser()
+    myMatsparser.feedEveryPage(browser)
+    # myMatsListResultByTakenID.append(myMatsparser.getResultByTakenID())
+    myMatsListResult = myMatsparser.getResultByTakenID()
+
+    print '=== myMatsListResult ===', '\n', myMatsListResult, '\n'
+
+    # stringResultByTakenID = json.dumps(dictResultByTakenID)
+    # with open('resultMats_ByTakenID_v2.txt' , 'wb') as f1:
+    #   f1.write(stringResultByTakenID
+
+        
+    #writeHead doesn't work now!
+    # csvHead = (['takenID'] + ['verifiedDate'] + ['serialNo'] + ['testID'] + ['Status'] + ['failLogLink'])
+
+    """ saving it into Mats.csv """
+    listToCsv( 'Mats.csv', myMatsListResult )
+
+    return myMatsListResult
+
 def TFLGo(browser, listTFL ,maxIdLen):
 
     myTFLListResult = []
     listTFLSplit = []
 
-    print '=====listTFL=== ', ' \n', listTFL, '\n'
+    print '=====strListTFL=== ', ' \n', listTFL, '\n'
 
     listTFLSplit = split255(listTFL,maxIdLen)
     print '=== listTFLSplit === ' , '\n',  listTFLSplit, '\n'
@@ -796,11 +868,20 @@ browser = webdriver.Firefox()
 browser.implicitly_wait(5)
 
 """ MatsRecherche """
-listMats = getInput("Input.txt")
-myMatsListResult = matsGo(browser, listMats)
+# resultJson = getInput("Input(date).txt") 
+resultJson = getInput("Input(2).txt")
 
+if resultJson['type'] == 'serialNumbers':
+    myMatsListResult = matsGoSN(browser , resultJson['contenu'])
+    print myMatsListResult
+elif resultJson['type'] == 'date':
+    myMatsListResult = matsGoDate(browser , resultJson['contenu'])
+    print myMatsListResult
+else :
+    print "type de config inconnu"
+    
 """ TFLRecherche """
-listTFL = str(getTFLTakenID(myMatsListResult)).replace(" ', '", ",").replace("'","")[2:-2]
+listTFL = str(getTFLTakenID(myMatsListResult)).replace(" ', '", ",").replace("'","")[1:-2]
 myTFLListResult = TFLGo(browser,listTFL,maxIdLen)
 
 print  '=== END of Extractor Test==='
