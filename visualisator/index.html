@@ -6,6 +6,7 @@
   <title>Visualisator</title>
 
   <link rel="stylesheet" href ="css/bootstrap.css">
+  <link rel="stylesheet" href ="css/visualisator.css">
 
   <!-- Dependencies -->
   <script type="text/javascript" src="js/libs/jquery.js"></script>
@@ -39,25 +40,43 @@
 <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
   <div class="container">
     <a class="navbar-brand" href="#">Visualisator</a>
+    <div class="navbar-form navbar-right">
+      <div class="form-group">
+        <select class="form-control" id="family-selector"></select>
+      </div>
+    </div>
   </div>
 </nav>
 
-<div class="container" id="main"></div>
+<div class="container" id="main">
+</div>
 
 <script type="text/javascript">
 window.currentPathURL = window.location.href.split('/').slice(0, -1).join('/');
 window.visualisatorConfigURL = [currentPathURL, 'visualisatorConfig.json'].join('/');
 
+window.families = [];
+window.familyViews = {};
+window.tools = {};
+
+window.showCurrentFamily = function() {
+  var currentFamilyUID = $('#family-selector').val(),
+      currentFamilyView = window.familyViews[currentFamilyUID];
+
+  _.each(_.values(window.familyViews), function(familyView) {
+    familyView.$.hide();
+  });
+
+  currentFamilyView.$.show();
+}
+
 $(document).ready(function() {
   window.visualisatorConfig = Utils.getJSONFile(visualisatorConfigURL);
   window.mainConfig = Utils.getJSONFile(window.visualisatorConfig.mainConfigPath);
 
-  window.families = [];
-  window.tools = {};
-
   _.each(window.mainConfig.families, function(rawFamily) {
     var family = new Family();
-    family.set('tests', rawFamily.orderedTestIDs);
+    family.set('tests', rawFamily.orderedTests);
     family.set('name', rawFamily.name);
 
     _.each(rawFamily.serialNumbers, function(sn) {
@@ -69,14 +88,14 @@ $(document).ready(function() {
     window.families.push(family);
   });
 
-  var mats = Utils.getCSVFile(window.visualisatorConfig.matsLog)
+  var mats = Utils.getCSVFile(window.visualisatorConfig.matsLog);
   _.each(mats, function(mat) {
     if(_.has(window.tools, mat[2])) {
       window.tools[mat[2]].parseMat(mat);
     }
   });
 
-  var tfls = Utils.getCSVFile(window.visualisatorConfig.tflsLog)
+  var tfls = Utils.getCSVFile(window.visualisatorConfig.tflsLog);
   _.each(tfls, function(tfl) {
     if(_.has(window.tools, tfl[2])) {
       window.tools[tfl[2]].parseTfl(tfl);
@@ -84,9 +103,22 @@ $(document).ready(function() {
   });
 
   _.each(window.families, function(family) {
-    var familyView = new FamilyView(family);
-    $('#main').append(familyView.render());
+    var familyUID = _.uniqueId('family_'),
+        jQel = $('<div id="' + familyUID +'" style="display: none;"></div>'),
+        jQoption = $('<option value="' + familyUID + '">' + family.get('name') + '</option>'),
+        familyView = new FamilyView(jQel, family);
+
+    window.familyViews[familyUID] = familyView;
+
+    $('#family-selector').append(jQoption);
+
+    familyView.render();
+    $('#main').append(jQel);
   });
+
+  $('#family-selector').on('change', window.showCurrentFamily);
+
+  window.showCurrentFamily();
 });
 </script>
 

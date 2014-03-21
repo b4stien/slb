@@ -1,6 +1,7 @@
 class FamilyView
 
-  constructor: (family) ->
+  constructor: (el, family) ->
+    @$ = el
     @family = family
 
   headerTpl: _.template "<tr>
@@ -12,12 +13,12 @@ class FamilyView
     @headerTpl view: @
 
   testTpl: _.template "<tr>
-    <td><%= testID %></td>
-    <% _.each(view.family.tools.models, function(tool) { %> <%= view.renderCell(tool, testID) %> <% }); %>
+    <th><%= test.name %></th>
+    <% _.each(view.family.tools.models, function(tool) { %> <%= view.renderCell(tool, test.id) %> <% }); %>
   </tr>"
 
-  renderTest: (testID) ->
-    @testTpl testID: testID, view: @
+  renderTest: (test) ->
+    @testTpl test: test, view: @
 
   cellTpl: _.template "<td class='test <%= toolTest.status() %>'>
     <% if(toolTest.lastMat()) { %>
@@ -35,8 +36,8 @@ class FamilyView
   tpl: _.template("<h3><%= view.family.get('name') %></h2>
   <table class='family table table-bordered'>
     <%= view.renderHeader() %>
-    <% _.each(view.family.get('tests'), function(testID) { %> <%= view.renderTest(testID) %> <% }); %>
+    <% _.each(view.family.get('tests'), function(test) { %> <%= view.renderTest(test) %> <% }); %>
   </table>")
 
   render: () ->
-    @tpl view: @
+    @$.html @tpl view: @

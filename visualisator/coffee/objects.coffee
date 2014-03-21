@@ -61,7 +61,5 @@ class ToolTest
 
   status: () ->
     if @lastMat()
-      if @lastMat().tfl
-        return 'info'
-      return 'success'
+      return 'test-' + @lastMat().status.toLowerCase()
     return ''
