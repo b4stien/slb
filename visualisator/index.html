@@ -67,7 +67,34 @@ window.visualisatorConfigURL = [currentPathURL, 'visualisatorConfig.json'].join(
 window.families = [];
 window.familyViews = {};
 window.tools = {};
+window.familyPrefixes = {};
 window.lastData = 0;
+
+if (typeof String.prototype.startsWith != 'function') {
+  // see below for better implementation!
+  String.prototype.startsWith = function (str){
+    return this.indexOf(str) == 0;
+  };
+}
+
+window.createToolIfNeeded = function(sn) {
+  if (window.mainConfig.type !== 'date' || _.has(window.tools, sn)) {
+    return undefined;
+  }
+
+  var hasBeenCreated = false;
+
+  _.each(window.familyPrefixes.keys(), function(prefix) {
+    if (hasBeenCreated || bsn.startsWith(prefix)) {
+      var family = window.familyPrefixes[prefix];
+      hasBeenCreated = true;
+
+      var tool = new Tool({sn: sn});
+      family.tools.add(tool);
+      window.tools[sn] = tool;
+    }
+  });
+}
 
 window.showCurrentFamily = function() {
   var currentFamilyUID = $('#family-selector').val(),
@@ -94,6 +121,8 @@ window.fetchData = function() {
 
   var mats = Utils.getCSVFile(window.visualisatorConfig.matsLog);
   _.each(mats, function(mat) {
+    window.createToolIfNeeded(mat[2]);
+
     if(_.has(window.tools, mat[2])) {
       window.tools[mat[2]].parseMat(mat);
       window.setLastData(mat[0]);
@@ -102,6 +131,8 @@ window.fetchData = function() {
 
   var tfls = Utils.getCSVFile(window.visualisatorConfig.tflsLog);
   _.each(tfls, function(tfl) {
+    window.createToolIfNeeded(tfl[2]);
+
     if(_.has(window.tools, tfl[2])) {
       window.tools[tfl[2]].parseTfl(tfl);
       window.setLastData(tfl[0]);
@@ -118,11 +149,18 @@ $(document).ready(function() {
     family.set('tests', rawFamily.orderedTests);
     family.set('name', rawFamily.name);
 
-    _.each(rawFamily.serialNumbers, function(sn) {
-      var tool = new Tool({sn: sn, tests: rawFamily.orderedTestIDs});
-      family.tools.add(tool);
-      window.tools[sn] = tool;
-    });
+    if (window.mainConfig.type === 'serialNumbers') {
+      _.each(rawFamily.serialNumbers, function(sn) {
+        var tool = new Tool({sn: sn});
+        family.tools.add(tool);
+        window.tools[sn] = tool;
+      });
+    }
+
+    else if (window.mainConfig.type === 'date') {
+      family.set('serialNumbersPrefix', rawFamily.serialNumbersPrefix);
+      window.familyPrefixes[rawFamily.serialNumbersPrefix] = family;
+    }
 
     window.families.push(family);
   });
