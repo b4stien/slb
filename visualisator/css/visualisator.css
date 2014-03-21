@@ -1,0 +1,15 @@
+/*
+* Some good-looking colors:
+*   success: #DFF0D8
+*   info: #D9EDF7
+*   warning: #FCF8E3
+*   danger: #F2DEDE
+*
+*/
+
+.test-pass, .test-submitted {
+    background-color: #DFF0D8;
+}
+.test-completed {
+    background-color: #D9EDF7;
+}

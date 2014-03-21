@@ -6,15 +6,27 @@
   <title>Configurator</title>
 
   <link rel="stylesheet" href ="css/bootstrap.css">
+  <link rel="stylesheet" href ="css/font-awesome.css">
 
   <!-- Dependencies -->
   <script type="text/javascript" src="js/libs/jquery.js"></script>
   <script type="text/javascript" src="js/libs/underscore.js"></script>
   <script type="text/javascript" src="js/libs/bootstrap.js"></script>
   <script type="text/javascript" src="js/libs/backbone.js"></script>
+  <script type="text/javascript" src="js/libs/moment.js"></script>
+  <script type="text/javascript" src="js/libs/FileSaver.js"></script>
 
   <!-- Application -->
+  <script type="text/javascript" src="js/objects.js"></script>
+  <script type="text/javascript" src="js/views.js"></script>
   <script type="text/javascript" src="js/app.js"></script>
+
+  <style>
+  .droppable {
+    border: 1px dashed black;
+    padding: 14px;
+  }
+  </style>
 </head>
 
 <body>
@@ -22,32 +34,266 @@
 <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
   <div class="container">
     <a class="navbar-brand" href="#">Configurator</a>
-    <ul class="nav navbar-nav navbar-right">
-      <li><a id="cfg-config-download" href="#">Download</a></li>
-    </ul>
   </div>
 </nav>
 
 <div class="container">
-<form>
 
 <div class="row">
-  <div class="col-xs-6">
-    <div class="form-group">
-      <div class="form-group">
-        <label for="cfg-config-name"><b>Config name</b></label>
-        <input class="form-control" id="cfg-config-name" name="cfg-config-name" type="text" value="">
+  <div class="col-xs-8">
+    <div id="alerts"></div>
+
+    <h1 id="general">General</h1>
+
+    <div class="row">
+      <div class="col-xs-6">
+        <div class="form-group">
+          <label for="cfg-config-name"><b>Config name</b></label>
+          <input class="form-control" id="cfg-config-name" name="cfg-config-name" type="text"  placeholder="Config name">
+        </div>
+
+        <div class="form-group">
+          <label for="cfg-config-type"><b>Type</b></label>
+          <select class="form-control" id="cfg-config-type" name="cfg-config-type">
+            <option value="serialNumbers">Serial Numbers</option>
+            <option value="date">Date</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="col-xs-6">
+        <div class="form-group">
+          <label for="cfg-config-timestamp"><b>Generated (timestamp)</b></label>
+          <input class="form-control" id="cfg-config-timestamp" name="cfg-config-timestamp" type="text" value="" disabled>
+        </div>
+
+        <div class="form-group" style="display: none;">
+          <label for="cfg-config-date"><b>Date</b></label>
+          <input class="form-control" id="cfg-config-date" name="cfg-config-date" type="text" value="">
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <h1>
+      Families
+      <a id="add-family" href="#" class="btn btn-default" style="margin-top:4px; float:right;"><i class="fa fa-plus"></i></a>
+    </h1>
+
+    <div id="families"></div>
+
+    <hr>
+
+    <h1 id="download">
+      Download
+      <a href="#" id="download-config" class="btn btn-default" style="margin-top:4px; float:right;"><i class="fa fa-download"></i></a>
+    </h1>
+
+    <pre id="cfg-config-download"></pre>
+  </div>
+
+  <div class="col-xs-3 col-xs-offset-1">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h2 class="panel-title">Nav</h2>
+      </div>
+      <div class="list-group">
+        <a href="#general" class="list-group-item">General</a>
+        <a href="#families" class="list-group-item">Families</a>
+        <a href="#download" class="list-group-item">Download</a>
+      </div>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h2 class="panel-title">Import</h2>
+      </div>
+      <div class="panel-body" id="import-config-zone">
+        <p style="font-style: italic;">Drag and drop the config file you want to import in this area, or press the "Import" button to select a file on your computer.</p>
+
+        <a href="#" id="import-config-button" class="btn btn-primary" style="margin-top:4px; float:right;">Import</a>
+        <input type="file" style="display:none;" id="import-config-file">
       </div>
     </div>
   </div>
-  <div class="col-xs-6"></div>
 </div>
 
-</form>
 </div>
 
 <script type="text/javascript">
+window.families = [];
+window.configType = 'serialNumbers';
 
+// Generate and dump the config in the correct field.
+window.generateConfig = function(stamp) {
+  if(stamp === undefined || stamp === true) {
+    $('#cfg-config-timestamp').val(moment().format('X'));
+  }
+  $('#cfg-config-download').html(JSON.stringify(Utils.buildConfig(), undefined, 2));
+}
+
+// Template to generate alerts.
+window.alertTpl = _.template("<div class='alert alert-<%= category %> alert-dismissable'><button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button><%= message %></div>");
+
+// Helper to add an alert.
+window.addAlert = function(category, message) {
+  $('#alerts').append(alertTpl({category:category, message:message}));
+}
+
+// Add a family to the families list. Is `familyJSON` is given, it will
+// be used to populate the family.
+window.addFamily = function(familyJSON) {
+  var family = new Family(window.configType),
+      stamp = true;
+  window.families.push(family);
+
+  if (familyJSON !== undefined) {
+    familyJSON['configType'] = window.configType;
+    family.parseFamily(familyJSON);
+    stamp = false;
+  }
+
+  var el = $('<div></div>');
+
+  var familyView = new FamilyView(el, family);
+  familyView.render();
+  $('#families').append(el);
+
+  family.on('change', function() {
+    window.generateConfig();
+  });
+
+  window.generateConfig(stamp);
+}
+
+// Switch the config type to the value contained in the config type
+// selector.
+window.changeConfigType = function() {
+  window.configType = $('#cfg-config-type').val();
+
+  if (configType === 'date') {
+    $('#cfg-config-date').parents('.form-group').show();
+  } else {
+    $('#cfg-config-date').parents('.form-group').hide();
+  }
+
+  _.each(window.families, function(family) {
+    family.setConfigType(window.configType);
+  });
+
+  window.generateConfig();
+}
+
+// Import a config file.
+window.importConfigFile = function(file) {
+  var reader = new FileReader();
+  reader.readAsText(file);
+
+  reader.onload = function(a, b, c) {
+    try {
+      var config = JSON.parse(reader.result);
+    } catch (SyntaxError) {
+      window.addAlert('danger', 'Invalid config file.');
+      return;
+    }
+
+    if (!Utils.isValidConfig(config)) {
+      window.addAlert('danger', 'Invalid config file.');
+      return;
+    }
+
+    $('#cfg-config-name').val(config['name']);
+
+    window.configType = config['type'];
+    if (window.configType === 'serialNumbers') {
+      $('#cfg-config-type option[value="serialNumbers"]').prop('selected', true);
+      $('#cfg-config-date').parents('.form-group').hide();
+    }
+    else if (window.configType === 'date') {
+      $('#cfg-config-type option[value="date"]').prop('selected', true);
+      $('#cfg-config-date').val(config['date']);
+      $('#cfg-config-date').parents('.form-group').show();
+    }
+
+    $('#cfg-config-timestamp').val(config['generatedTimestamp']);
+
+    window.families = [];
+    $('#families').empty();
+
+    _.each(config['families'], function(family) {
+      window.addFamily(family);
+    });
+
+    window.generateConfig(false);
+  }
+}
+
+$(document).ready(function() {
+  window.addFamily();
+  window.generateConfig();
+
+  // Set up the listenners to react to events.
+
+  $('#cfg-config-type').on('change', window.changeConfigType);
+
+  $('#cfg-config-name').on('change keyup', function() {
+    window.generateConfig();
+  });
+
+  $('#cfg-config-date').on('change keyup', function() {
+    window.generateConfig();
+  });
+
+  $('#add-family').on('click', function(e) {
+    window.addFamily();
+    e.preventDefault();
+  });
+
+  $('#download-config').on('click', function(e) {
+    var blob = new Blob([JSON.stringify(Utils.buildConfig(), undefined, 2)], {type: "application/json;charset=utf-8"});
+    saveAs(blob, "config.json");
+    e.preventDefault();
+  });
+
+  $('#import-config-button').on('click', function(e) {
+    $('#import-config-file').click();
+    return false;
+  });
+
+  $('#import-config-file').on('change', function(e) {
+    var file = this.files[0];
+    $('#file-input').val('');
+    window.importConfigFile(file);
+  });
+
+  $('#import-config-zone').on('dragover', function(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    $(this).addClass('droppable');
+  });
+
+  $('#import-config-zone').on('dragleave', function(e) {
+    e.stopPropagation();
+    e.preventDefault();
+   $(this).removeClass('droppable');
+  });
+
+  $('#import-config-zone').on('drop', function(e) {
+    e.stopPropagation();
+    e.preventDefault();
+
+    var files = e.originalEvent.dataTransfer.files;
+
+    if(_.size(files) != 1) {
+      window.addAlert('danger', 'You tried to import multiple config files...');
+      $(this).removeClass('droppable');
+      return;
+    }
+    window.importConfigFile(files[0]);
+    $(this).removeClass('droppable');
+  });
+});
 </script>
 
 </body>

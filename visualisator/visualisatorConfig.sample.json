@@ -1,0 +1,6 @@
+{
+  "matsLog": "local/mats.csv",                  // path to the extracted mats csv file
+  "tflsLog": "local/tfls.csv",                  // path to the extracted tfl csv file
+  "mainConfigPath": "local/mainConfig.json",    // path to the config file (created by the configurator)
+  "fetchInterval": 5000                         // interval (in milliseconds) between two fetches
+}

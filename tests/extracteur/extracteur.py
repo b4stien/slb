@@ -674,14 +674,16 @@ def getInput(relativePath):
         contenu = ', '.join(contenu)
     elif monType == "date" :
         contenu = config['date']
-    contenu
+
     monInput['type'] = monType.encode("utf-8")
     monInput['contenu'] = contenu.encode("utf-8")
     JsonInput.close()
+
+    print '=== monInput === ' , '\n', monInput, '\n'
     return monInput
 
 def matsGoSN(browser, listMats):
-    print "in SN loop"
+
     myMatsListResult = []
     print '=== strListMats === ' , '\n', listMats, '\n'
 
@@ -866,7 +868,9 @@ browser = webdriver.Firefox()
 browser.implicitly_wait(5)
 
 """ MatsRecherche """
-resultJson = getInput("Input(date).txt")
+# resultJson = getInput("Input(date).txt") 
+resultJson = getInput("Input(2).txt")
+
 if resultJson['type'] == 'serialNumbers':
     myMatsListResult = matsGoSN(browser , resultJson['contenu'])
     print myMatsListResult
