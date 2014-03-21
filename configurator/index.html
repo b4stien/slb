@@ -122,10 +122,10 @@
 </div>
 
 <script type="text/javascript">
-
 window.families = [];
 window.configType = 'serialNumbers';
 
+// Generate and dump the config in the correct field.
 window.generateConfig = function(stamp) {
   if(stamp === undefined || stamp === true) {
     $('#cfg-config-timestamp').val(moment().format('X'));
@@ -133,12 +133,16 @@ window.generateConfig = function(stamp) {
   $('#cfg-config-download').html(JSON.stringify(Utils.buildConfig(), undefined, 2));
 }
 
+// Template to generate alerts.
 window.alertTpl = _.template("<div class='alert alert-<%= category %> alert-dismissable'><button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button><%= message %></div>");
 
+// Helper to add an alert.
 window.addAlert = function(category, message) {
   $('#alerts').append(alertTpl({category:category, message:message}));
 }
 
+// Add a family to the families list. Is `familyJSON` is given, it will
+// be used to populate the family.
 window.addFamily = function(familyJSON) {
   var family = new Family(window.configType),
       stamp = true;
@@ -163,6 +167,8 @@ window.addFamily = function(familyJSON) {
   window.generateConfig(stamp);
 }
 
+// Switch the config type to the value contained in the config type
+// selector.
 window.changeConfigType = function() {
   window.configType = $('#cfg-config-type').val();
 
@@ -179,6 +185,7 @@ window.changeConfigType = function() {
   window.generateConfig();
 }
 
+// Import a config file.
 window.importConfigFile = function(file) {
   var reader = new FileReader();
   reader.readAsText(file);
@@ -225,6 +232,8 @@ window.importConfigFile = function(file) {
 $(document).ready(function() {
   window.addFamily();
   window.generateConfig();
+
+  // Set up the listenners to react to events.
 
   $('#cfg-config-type').on('change', window.changeConfigType);
 
