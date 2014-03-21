@@ -59,8 +59,10 @@
 </div>
 
 <script type="text/javascript">
+// Datetime format
 window.momentFormat = 'YYYY-MM-DD[T]HH:mm:ss[Z]';
 
+// Helpers for URL
 window.currentPathURL = window.location.href.split('/').slice(0, -1).join('/');
 window.visualisatorConfigURL = [currentPathURL, 'visualisatorConfig.json'].join('/');
 
@@ -70,18 +72,24 @@ window.tools = {};
 window.familyPrefixes = {};
 window.lastData = 0;
 
+// Polyfill for String.startsWith()
 if (typeof String.prototype.startsWith != 'function') {
-  // see below for better implementation!
   String.prototype.startsWith = function (str){
     return this.indexOf(str) == 0;
   };
 }
 
-window.createToolIfNeeded = function(sn) {
-  if (window.mainConfig.type !== 'date' || _.has(window.tools, sn)) {
+// Create a Tool corresponding to the given serialNumber (an add it to
+// the correct family) if needed.
+window.createToolIfNeeded = function(serialNumber) {
+  // If the type of the config isn't date or the tool already exists, we
+  // don't need to do anything.
+  if (window.mainConfig.type !== 'date' || _.has(window.tools, serialNumber)) {
     return undefined;
   }
 
+  // Flag to create only one tool, even if multiple prefixes match the
+  // given serialNumber.
   var hasBeenCreated = false;
 
   _.each(window.familyPrefixes.keys(), function(prefix) {
@@ -89,13 +97,14 @@ window.createToolIfNeeded = function(sn) {
       var family = window.familyPrefixes[prefix];
       hasBeenCreated = true;
 
-      var tool = new Tool({sn: sn});
+      var tool = new Tool({sn: serialNumber});
       family.tools.add(tool);
-      window.tools[sn] = tool;
+      window.tools[serialNumber] = tool;
     }
   });
 }
 
+// Set the view to the selected (in the navbar selector) family.
 window.showCurrentFamily = function() {
   var currentFamilyUID = $('#family-selector').val(),
       currentFamilyView = window.familyViews[currentFamilyUID];
@@ -107,6 +116,7 @@ window.showCurrentFamily = function() {
   currentFamilyView.$.show();
 }
 
+// Update the last data (in the navbar) field.
 window.setLastData = function(timestamp) {
   if(timestamp <= window.lastData) {
     return undefined;
@@ -116,6 +126,8 @@ window.setLastData = function(timestamp) {
   $('#last-data').text(moment(timestamp, 'X').format(window.momentFormat));
 }
 
+// Fetch the 2 csv (mats and logs) and dispatch the logs to the correct
+// tools, creating them if needed.
 window.fetchData = function() {
   $('#last-fetch').text(moment().format(window.momentFormat));
 
@@ -141,9 +153,11 @@ window.fetchData = function() {
 }
 
 $(document).ready(function() {
+  // Get the 2 configs.
   window.visualisatorConfig = Utils.getJSONFile(visualisatorConfigURL);
   window.mainConfig = Utils.getJSONFile(window.visualisatorConfig.mainConfigPath);
 
+  // Parse the config file to create families
   _.each(window.mainConfig.families, function(rawFamily) {
     var family = new Family();
     family.set('tests', rawFamily.orderedTests);
@@ -165,10 +179,12 @@ $(document).ready(function() {
     window.families.push(family);
   });
 
-
+  // Fetch the 2 csv for the first time, and set an interval to fetch
+  // them periodically.
   window.fetchData();
-  window.fetchInterval = setInterval(window.fetchData, 5000);
+  window.fetchInterval = setInterval(window.fetchData, window.visualisatorConfig.fetchInterval);
 
+  // Create family views and append families to the family selector
   _.each(window.families, function(family) {
     var familyUID = _.uniqueId('family_'),
         jQel = $('<div id="' + familyUID +'" style="display: none;"></div>'),
@@ -183,8 +199,8 @@ $(document).ready(function() {
     $('#main').append(jQel);
   });
 
+  // Set a listenner on the family selector and show the first family
   $('#family-selector').on('change', window.showCurrentFamily);
-
   window.showCurrentFamily();
 });
 </script>
