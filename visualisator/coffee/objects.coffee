@@ -10,7 +10,12 @@ class Tool extends Backbone.Model
     @logs = []
 
   insertLog: (log) ->
+    duplicate = _.find(@logs, (otherLog) -> JSON.stringify(log) == JSON.stringify(otherLog))
+    if duplicate
+      return
+
     @logs.splice _.sortedIndex(@logs, log, (log) -> log.timestamp), 0, log
+    @trigger 'change'
 
   parseMat: (rawMat) ->
     mat =

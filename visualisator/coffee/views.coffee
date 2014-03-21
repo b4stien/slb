@@ -4,6 +4,9 @@ class FamilyView
     @$ = el
     @family = family
 
+    @family.tools.on 'change', () =>
+      @render()
+
   headerTpl: _.template "<tr>
     <th></th>
     <% _.each(view.family.tools.models, function(tool) { %> <th><%= tool.get('sn') %></th> <% }); %>
@@ -23,7 +26,7 @@ class FamilyView
   cellTpl: _.template "<td class='test <%= toolTest.status() %>'>
     <% if(toolTest.lastMat()) { %>
       <span class='test-status'><%= toolTest.lastMat().status %></span><% if(toolTest.lastMat().tfl) { %> - <a href='<%= toolTest.lastMat().tfl %>'>TFL</a><% } %>
-      <span class='test-timestamp'><%= toolTest.lastDate().format('YYYY-MM-DD[T]HH:mm:ss[Z]') %></span>
+      <span class='test-timestamp'><%= toolTest.lastDate().format(window.momentFormat) %></span>
     <% } else { %>
       <span class='test-status'>None</span>
     <% } %>

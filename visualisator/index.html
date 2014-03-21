@@ -32,6 +32,9 @@
     display: block;
     font-size: 0.8em;
   }
+  .visualisator-info li {
+    border-right: 1px solid #555;
+  }
   </style>
 </head>
 
@@ -45,6 +48,10 @@
         <select class="form-control" id="family-selector"></select>
       </div>
     </div>
+    <ul class="nav navbar-nav navbar-right visualisator-info" style="margin-right:10px;">
+      <li><a>Last fetch: <span id="last-fetch" style="font-weight: bold;">17/12/2013 12:22</span></a></li>
+      <li><a>Last data: <span id="last-data" style="font-weight: bold;">17/12/2013 12:22</span></a></li>
+    </ul>
   </div>
 </nav>
 
@@ -52,12 +59,15 @@
 </div>
 
 <script type="text/javascript">
+window.momentFormat = 'YYYY-MM-DD[T]HH:mm:ss[Z]';
+
 window.currentPathURL = window.location.href.split('/').slice(0, -1).join('/');
 window.visualisatorConfigURL = [currentPathURL, 'visualisatorConfig.json'].join('/');
 
 window.families = [];
 window.familyViews = {};
 window.tools = {};
+window.lastData = 0;
 
 window.showCurrentFamily = function() {
   var currentFamilyUID = $('#family-selector').val(),
@@ -68,6 +78,35 @@ window.showCurrentFamily = function() {
   });
 
   currentFamilyView.$.show();
+}
+
+window.setLastData = function(timestamp) {
+  if(timestamp <= window.lastData) {
+    return undefined;
+  }
+
+  window.lastData = timestamp;
+  $('#last-data').text(moment(timestamp, 'X').format(window.momentFormat));
+}
+
+window.fetchData = function() {
+  $('#last-fetch').text(moment().format(window.momentFormat));
+
+  var mats = Utils.getCSVFile(window.visualisatorConfig.matsLog);
+  _.each(mats, function(mat) {
+    if(_.has(window.tools, mat[2])) {
+      window.tools[mat[2]].parseMat(mat);
+      window.setLastData(mat[0]);
+    }
+  });
+
+  var tfls = Utils.getCSVFile(window.visualisatorConfig.tflsLog);
+  _.each(tfls, function(tfl) {
+    if(_.has(window.tools, tfl[2])) {
+      window.tools[tfl[2]].parseTfl(tfl);
+      window.setLastData(tfl[0]);
+    }
+  });
 }
 
 $(document).ready(function() {
@@ -88,19 +127,9 @@ $(document).ready(function() {
     window.families.push(family);
   });
 
-  var mats = Utils.getCSVFile(window.visualisatorConfig.matsLog);
-  _.each(mats, function(mat) {
-    if(_.has(window.tools, mat[2])) {
-      window.tools[mat[2]].parseMat(mat);
-    }
-  });
 
-  var tfls = Utils.getCSVFile(window.visualisatorConfig.tflsLog);
-  _.each(tfls, function(tfl) {
-    if(_.has(window.tools, tfl[2])) {
-      window.tools[tfl[2]].parseTfl(tfl);
-    }
-  });
+  window.fetchData();
+  window.fetchInterval = setInterval(window.fetchData, 5000);
 
   _.each(window.families, function(family) {
     var familyUID = _.uniqueId('family_'),
