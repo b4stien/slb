@@ -541,10 +541,7 @@ def matsGoSN(browser, listMats):
             """ finding the MatsQuery area"""
             area = browser.find_element_by_xpath("//area[contains(@alt, 'Query Performed Tests')]")
             """ clicking on it """
-            focusActiveElement(browser)
-            test = ActionChains(browser)
-            test.click(area)
-            test.perform()
+            area.click()
         except :
             '\nError : Problem during Mats Research while handling home page.'
             browser.close()
@@ -606,42 +603,31 @@ def matsGoDate(browser, date, listPrefixes): # we chose the "performed date" inp
 
         try :
             switchToFrameMainMenu(browser)
-
             """ finding the MatsQuery area"""
             area = browser.find_element_by_xpath("//area[contains(@alt, 'Query Performed Tests')]")
-
             """ clicking on it """
-            focusActiveElement(browser)
-            test = ActionChains(browser)
-            test.click(area)
-            test.perform()
+            area.click()
         except :
             print '\nError : Problem during Mats Research while handling home page.'
             browser.close()
 
         try :    
             """ writing the prefixes in the prefixes input """
-            browser.find_element_by_name(inputPrefixes).send_keys(listPrefixesSplit.pop())
-            
-            
+            browser.find_element_by_name(inputPrefixes).send_keys(listPrefixesSplit.pop())                       
             
             """ writing the list in the Performed Date input """
             inputElement = browser.find_element_by_name(inputDateSelect)
             inputElement.click()
 
-            allOptions = inputElement.find_elements_by_tag_name("option")
             selected = ''
-            while selected != '>=':
-                for option in allOptions:
+            while selected != '>=' :
+                for option in inputElement.find_elements_by_tag_name("option"):
                     if (option.get_attribute('selected')):
                         selected = option.get_attribute('value')
                     if option.get_attribute('value') == '>=': # indicating we want all tests performed after the specified date
-                        test = ActionChains(browser)
-                        test.move_to_element(option) # the right option needs to get hovered on before being clicked
-                        test.click()
-                        test.click()
-                        test.perform()
+                        option.click()
                         browser.find_element_by_name(inputDate).click()
+                        
 
             """ writing the list in the date input """
             browser.find_element_by_name(inputDate).send_keys(date)
@@ -701,10 +687,7 @@ def TFLGo(browser, listTFL ,maxIdLen):
             img = browser.find_element_by_xpath("//img[contains(@alt, 'Test Failed')]")
 
             """ clicking on it """
-            focusActiveElement(browser)
-            test = ActionChains(browser)
-            test.click(img)
-            test.perform()
+            img.click()
         except :
             print '\nError : Problem during TFL Research while handling home page.'
             browser.close()
