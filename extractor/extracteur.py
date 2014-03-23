@@ -53,7 +53,6 @@ from selenium.webdriver.common.action_chains import ActionChains
 import time
 import os
 
-
 """""""""""""""""""""""""""      CLASSES      """""""""""""""""""""""""""
 
 
@@ -740,6 +739,7 @@ try :
     print '=== Succesful config file import ==='
 except :
     print 'Error : Unable to import config.'
+    exit()
 ############################################################################
 
 
