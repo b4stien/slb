@@ -1,0 +1,19 @@
+{
+  "name": "With serial numbers",
+  "type": "serialNumbers",
+  "generatedTimestamp": "1395410561",
+  "families": [
+    {
+      "name": "HPCC-A",
+      "orderedTests": [],
+      "serialNumbers": [
+        "HPCC-A.705",
+        "HPCC-A.706",
+        "HPCC-A.707",
+        "HPCC-A.708",
+        "HPCC-A.709",
+        "HPCC-A.710"
+      ]
+    }
+  ]
+}
