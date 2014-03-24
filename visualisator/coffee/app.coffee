@@ -6,28 +6,38 @@ class Utils
     xhr.send null
     JSON.parse xhr.responseText
 
-  CSVToArray = (csvString) ->
-    result = []
+  CSVToArray: (strData, strDelimiter) ->
+    strDelimiter = (strDelimiter || ",")
+    objPattern = new RegExp("(\\" + strDelimiter + "|\\r?\\n|\\r|^)(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|([^\"\\" + strDelimiter + "\\r\\n]*))", "gi")
 
-    _.each csvString.split('\n'), (csvLine) ->
-      resultLine = [];
-      resultLine.rawLine = csvLine;
+    arrData = [[]]
+    arrMatches = null
 
-      if csvLine.trim() == ''
-        return
+    while (arrMatches = objPattern.exec(strData))
+      strMatchedDelimiter = arrMatches[1]
 
-      _.each csvLine.split(','), (csvItem) ->
-        resultLine.push csvItem.trim()
+      if strMatchedDelimiter.length && (strMatchedDelimiter != strDelimiter)
+        arrData.push([])
 
-      result.push resultLine
+      if (arrMatches[2])
+        strMatchedValue = arrMatches[2].replace(new RegExp( "\"\"", "g" ), "\"")
 
-    result
+      else
+        strMatchedValue = arrMatches[3]
+
+      arrData[arrData.length - 1].push(strMatchedValue.trim())
+
+    return arrData
 
   getCSVFile: (fileURL) ->
     xhr = new XMLHttpRequest()
     xhr.open 'GET', fileURL, false
     xhr.overrideMimeType 'text/csv'
     xhr.send null
-    CSVToArray xhr.responseText
+    @CSVToArray xhr.responseText, ','
 
-Utils = new Utils()
+  parseRedo: (redoString) ->
+    []
+
+window.Utils = new Utils()
+

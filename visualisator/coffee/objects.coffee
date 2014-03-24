@@ -17,10 +17,17 @@ class Tool extends Backbone.Model
     @logs.splice _.sortedIndex(@logs, log, (log) -> log.timestamp), 0, log
     @trigger 'change'
 
+  addRedo: (testID, timestamp) ->
+    redo =
+      'type': 'redo'
+      'timestamp': timestamp
+      'testID': testID
+    @insertLog mat
+
   parseMat: (rawMat) ->
     mat =
       'type': 'mat'
-      'timestamp': rawMat[0]
+      'timestamp': parseInt(rawMat[0])
       'testID': rawMat[3]
       'status': rawMat[4]
       'rawLog': rawMat
@@ -31,9 +38,19 @@ class Tool extends Backbone.Model
   parseTfl: (rawTfl) ->
     tfl =
       'type': 'tfl'
-      'timestamp': rawTfl[0]
+      'timestamp': parseInt(rawTfl[0])
       'testID': rawTfl[3]
+      'redo': rawTfl[5]
       'rawLog': rawTfl
+
+    if tfl.redo
+      console.log 'redo !'
+      console.log tfl.redo
+
+      testIDs = Utils.parseRedo tfl.redo
+      _.each testIDs, (testID) =>
+        @addRedo testID, tfl.timestamp
+
     @insertLog tfl
 
   getToolTest: (testID) ->
